@@ -10,5 +10,35 @@
     "url": "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_S.gguf",
     "sizeMB": 644,
     "description": "Higher quality, somewhat larger file size"
+  },
+  {
+    "name": "DeepSeek LLM 7B Q4_K_M",
+    "url": "https://huggingface.co/TheBloke/deepseek-llm-7B-base-GGUF/resolve/main/deepseek-llm-7b-base.Q4_K_M.gguf",
+    "sizeMB": 4367,
+    "description": "Large general-purpose model. Powerful and well-balanced."
+  },
+  {
+    "name": "Mixtral-8x7B-Instruct Q4_K_M",
+    "url": "https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf",
+    "sizeMB": 4774,
+    "description": "Very powerful Mixture-of-Experts model. Handles complex tasks and long contexts."
+  },
+  {
+    "name": "Zephyr-7B-beta Q4_K_M",
+    "url": "https://huggingface.co/TheBloke/zephyr-7B-beta-GGUF/resolve/main/zephyr-7b-beta.Q4_K_M.gguf",
+    "sizeMB": 4076,
+    "description": "Community favorite. Fast and instruction-tuned for chat and creative tasks."
+  },
+  {
+    "name": "Google Gemma-2B Q4_K_M",
+    "url": "https://huggingface.co/TheBloke/gemma-2b-GGUF/resolve/main/gemma-2b.Q4_K_M.gguf",
+    "sizeMB": 2235,
+    "description": "Google's efficient and strong model. Performs well on mobile hardware."
+  },
+  {
+    "name": "Microsoft Phi-3-mini Q4_K_M",
+    "url": "https://huggingface.co/TheBloke/phi-3-mini-4k-instruct-GGUF/resolve/main/phi-3-mini-4k-instruct.Q4_K_M.gguf",
+    "sizeMB": 3702,
+    "description": "Microsoft's state-of-the-art compact model. Very strong at reasoning and coding."
   }
 ]

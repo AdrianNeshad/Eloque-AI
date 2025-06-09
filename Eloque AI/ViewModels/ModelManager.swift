@@ -36,7 +36,6 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
         }
     }
     
-    // Public async function to load last selected model at app start
     @MainActor
     func loadLastSelectedModel() async {
         guard !lastSelectedModelName.isEmpty else { return }
@@ -113,8 +112,6 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
         currentProfile?.sourcePath
     }
     
-    // MARK: - URLSessionDownloadDelegate
-    
     nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
                     didWriteData bytesWritten: Int64,
                     totalBytesWritten: Int64,
@@ -140,13 +137,19 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
         
         do {
             let destination = fileHelper.modelsDirectory.appendingPathComponent("\(modelName).gguf")
-            
             if FileManager.default.fileExists(atPath: destination.path) {
                 try FileManager.default.removeItem(at: destination)
             }
-            
             try FileManager.default.moveItem(at: location, to: destination)
-            
+            let attrs = try FileManager.default.attributesOfItem(atPath: destination.path)
+            if let fileSize = attrs[.size] as? NSNumber {
+                if fileSize.intValue < 10_000_000 {
+                    try FileManager.default.removeItem(at: destination)
+                    continuation.resume(throwing: NSError(domain: "ModelManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Download failed. Server denied download"]))
+                    return
+                }
+            }
+
             continuation.resume(returning: destination)
         } catch {
             continuation.resume(throwing: error)
