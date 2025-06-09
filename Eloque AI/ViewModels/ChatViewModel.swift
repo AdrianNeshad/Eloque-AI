@@ -11,17 +11,23 @@ import SwiftUI
 
 @MainActor
 class ChatViewModel: ObservableObject {
-    @Published var messages: [ChatMessage] = []
     @AppStorage("appLanguage") private var appLanguage = "en"
+    @Published var messages: [ChatMessage] = []
+    @Published var isGenerating = false
+    @Published var partialResponse: String? = nil
     
     var modelPath: String?
 
     func sendMessage(_ prompt: String) {
         messages.append(ChatMessage(text: prompt, isFromUser: true))
+        isGenerating = true
+        partialResponse = ""
 
         Task {
-            guard let path = modelPath else { 
+            guard let path = modelPath else {
                 messages.append(ChatMessage(text: "⚠️ No model chosen", isFromUser: false))
+                isGenerating = false
+                partialResponse = nil
                 return
             }
 
@@ -39,13 +45,17 @@ class ChatViewModel: ObservableObject {
                 var response = ""
                 for try await token in stream {
                     response += token
+                    await MainActor.run {
+                        self.partialResponse = response
+                    }
                 }
 
                 messages.append(ChatMessage(text: response, isFromUser: false))
-
             } catch {
                 messages.append(ChatMessage(text: "⚠️ Error: \(error.localizedDescription)", isFromUser: false))
             }
+            isGenerating = false
+            partialResponse = nil
         }
     }
 }
