@@ -20,7 +20,7 @@ class ChatViewModel: ObservableObject {
         messages.append(ChatMessage(text: prompt, isFromUser: true))
 
         Task {
-            guard let path = modelPath else {
+            guard let path = modelPath else { 
                 messages.append(ChatMessage(text: "⚠️ No model chosen", isFromUser: false))
                 return
             }
