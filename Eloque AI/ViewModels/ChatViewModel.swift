@@ -7,10 +7,13 @@
     
 import Foundation
 import Kuzco
+import SwiftUI
 
 @MainActor
 class ChatViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = []
+    @AppStorage("appLanguage") private var appLanguage = "en"
+    
     var modelPath: String?
 
     func sendMessage(_ prompt: String) {
@@ -18,7 +21,7 @@ class ChatViewModel: ObservableObject {
 
         Task {
             guard let path = modelPath else {
-                messages.append(ChatMessage(text: "⚠️ Ingen modell är vald.", isFromUser: false))
+                messages.append(ChatMessage(text: "⚠️ No model chosen", isFromUser: false))
                 return
             }
 
@@ -41,7 +44,7 @@ class ChatViewModel: ObservableObject {
                 messages.append(ChatMessage(text: response, isFromUser: false))
 
             } catch {
-                messages.append(ChatMessage(text: "⚠️ Fel: \(error.localizedDescription)", isFromUser: false))
+                messages.append(ChatMessage(text: "⚠️ Error: \(error.localizedDescription)", isFromUser: false))
             }
         }
     }

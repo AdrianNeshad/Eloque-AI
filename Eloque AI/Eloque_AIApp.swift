@@ -22,11 +22,12 @@ struct Eloque_AIApp: App {
                 .onAppear {
                     if !hasLaunchedBefore {
                         setLanguageFromSystem()
+                        setDarkModeFromSystem()
                         hasLaunchedBefore = true
                     }
                 }
         }
-    }
+    } 
     
     func setLanguageFromSystem() {
             let preferred = Locale.preferredLanguages.first ?? "en"
@@ -36,4 +37,12 @@ struct Eloque_AIApp: App {
                 appLanguage = "en"
             }
         }
+    
+    func setDarkModeFromSystem() {
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+               isDarkMode = true
+           } else {
+               isDarkMode = false
+           }
+    }
 }

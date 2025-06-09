@@ -9,7 +9,7 @@ import SwiftUI
 
 class StringManager {
     static let shared = StringManager()
-    @AppStorage("appLanguage") var language: String = "en"
+    @AppStorage("appLanguage") var appLanguage: String = "en"
     
     private let sv: [String: String] = [
         "settings": "Inställningar",
@@ -40,6 +40,7 @@ class StringManager {
         "send": "Skicka",
         "download": "Ladda ner",
         "chosemodel": "Vald modell:",
+        "models": "AI-modeller",
     ]
     
     private let en: [String: String] = [
@@ -71,6 +72,7 @@ class StringManager {
         "send": "Send",
         "download": "Download",
         "chosenmodel": "Chosen model:",
+        "models": "AI-Models",
     ]
     
     private var tables: [String: [String: String]] {
@@ -81,6 +83,6 @@ class StringManager {
     }
 
     func get(_ key: String) -> String {
-        tables[language]?[key] ?? key
+        tables[appLanguage]?[key] ?? key
     }
 }

@@ -11,8 +11,9 @@ struct ChatView: View {
     @EnvironmentObject var modelManager: ModelManager
     @StateObject var viewModel = ChatViewModel()
     @AppStorage("isDarkMode") private var isDarkMode = true
+    @AppStorage("appLanguage") private var appLanguage = "en"
     @State private var inputText = ""
-
+    
     var body: some View {
         VStack {
             ScrollView {

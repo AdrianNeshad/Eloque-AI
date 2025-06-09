@@ -7,11 +7,14 @@
 
 import Foundation
 import Kuzco
+import SwiftUI
 
 @MainActor
 class ModelManager: ObservableObject {
+    @AppStorage("appLanguage") private var appLanguage = "en"
     @Published var availableModels: [LLMModelInfo] = []
     @Published var currentModel: LlamaInstance?
+    
     private var currentProfile: ModelProfile?
 
     let fileHelper = FileHelper()

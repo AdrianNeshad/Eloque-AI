@@ -10,7 +10,8 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var modelManager: ModelManager
     @AppStorage("isDarkMode") private var isDarkMode = true
-
+    @AppStorage("appLanguage") private var appLanguage = "en"
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -61,6 +62,7 @@ struct ContentView: View {
             }
             .padding()
             .navigationTitle("")
+            .preferredColorScheme(isDarkMode ? .dark : .light)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: Settings()) {
@@ -76,5 +78,4 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(ModelManager())
-        .preferredColorScheme(.dark)
 }

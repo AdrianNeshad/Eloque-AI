@@ -10,13 +10,14 @@ import SwiftUI
 struct ModelPickerView: View {
     @EnvironmentObject var modelManager: ModelManager
     @AppStorage("isDarkMode") private var isDarkMode = true
-
+    @AppStorage("appLanguage") private var appLanguage = "en"
+    
     var body: some View {
         List(modelManager.availableModels) { model in
             VStack(alignment: .leading) {
-                Text(model.name).font(.headline)
-                Text(model.description).font(.subheadline)
-                Text("Size: \(model.sizeMB) MB").font(.caption)
+                Text(model.name).font(.title).bold().padding(.bottom, 5)
+                Text(model.description).font(.subheadline).padding(.bottom, 10)
+                Text("Size: \(model.sizeMB) MB").font(.subheadline)
                 Button(StringManager.shared.get("download")) {
                     Task {
                         let url = try await modelManager.downloadModel(model)
@@ -30,6 +31,6 @@ struct ModelPickerView: View {
         .task {
             try? await modelManager.loadAvailableModels()
         }
-        .navigationTitle("AI-Modeller")
+        .navigationTitle(StringManager.shared.get("models"))
     }
 }
