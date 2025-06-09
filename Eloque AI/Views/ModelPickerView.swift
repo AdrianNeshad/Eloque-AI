@@ -14,7 +14,7 @@ struct ModelPickerView: View {
     
     @State private var errorMessage: String? = nil
     @State private var showingErrorAlert = false
-    
+     
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
@@ -23,12 +23,13 @@ struct ModelPickerView: View {
                         Button {
                             Task {
                                 do {
-                                    let url = modelManager.fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf")
+                                    let url = modelManager.fileHelper.modelsDirectory.appendingPathComponent("\(model.name)")
                                     if FileManager.default.fileExists(atPath: url.path) {
                                         try await modelManager.loadModel(at: url)
-                                    } else {
                                     }
                                 } catch {
+                                    errorMessage = "Kunde inte ladda modellen: \(error.localizedDescription)"
+                                    showingErrorAlert = true
                                 }
                             }
                         } label: {
@@ -45,23 +46,54 @@ struct ModelPickerView: View {
                                 Text(model.description)
                                     .font(.subheadline)
                                     .padding(.bottom, 10)
-                                Text("Size: \(model.sizeMB) MB")
-                                    .font(.subheadline)
-                                    .padding(.bottom, -12)
+                                HStack {
+                                    Text(StringManager.shared.get("size"))
+                                    Text("\(model.sizeMB)")
+                                        .padding(.leading, -5)
+                                    Text("MB")
+                                        .padding(.leading, -5)
+                                }
+                                .font(.subheadline)
+                                .padding(.bottom, -12)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .buttonStyle(.plain)
+                        .disabled(modelManager.isDownloading[model.name] == true)
+                        
                         HStack {
                             if let progress = modelManager.downloadProgress[model.name] {
                                 VStack(alignment: .leading, spacing: 4) {
                                     HStack(spacing: 8) {
                                         ProgressView(value: progress)
                                             .progressViewStyle(LinearProgressViewStyle(tint: .blue))
-                                            .frame(height: 4)
+                                            .frame(height: 6)
+                                            .scaleEffect(y: 1.5)
+                                        
+                                        Text("\(Int(progress * 100))%")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                            .monospacedDigit()
                                     }
-                                    Text("Downloading... \(Int(progress * 100))%")
-                                        .font(.caption) 
+                                    Text(StringManager.shared.get("downloading"))
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            } else if modelManager.isDownloading[model.name] == true {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack(spacing: 8) {
+                                        ProgressView()
+                                            .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                                            .frame(height: 6)
+                                        
+                                        Text("0%")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                            .monospacedDigit()
+                                    }
+                                    Text(StringManager.shared.get("downloading"))
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
                                 }
                             } else if modelManager.isModelDownloaded(model) {
                                 Button(role: .destructive) {
@@ -72,7 +104,7 @@ struct ModelPickerView: View {
                                         showingErrorAlert = true
                                     }
                                 } label: {
-                                    Label("Radera", systemImage: "trash")
+                                    Label(StringManager.shared.get("delete"), systemImage: "trash")
                                 }
                             } else {
                                 Button(StringManager.shared.get("download")) {
@@ -96,7 +128,7 @@ struct ModelPickerView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(isDarkMode ? Color(.secondarySystemBackground) : Color(.systemBackground))
+                            .fill(isDarkMode ? Color(.secondarySystemBackground) : Color.gray.opacity(0.2))
                             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                     )
                     .padding(.horizontal)
@@ -106,9 +138,9 @@ struct ModelPickerView: View {
         }
         .task {
             try? await modelManager.loadAvailableModels()
-        }
+        } 
         .navigationTitle(StringManager.shared.get("models"))
-        .alert("Fel", isPresented: $showingErrorAlert) {
+        .alert("Error", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorMessage ?? "")

@@ -11,7 +11,7 @@ struct ContentView: View {
     @EnvironmentObject var modelManager: ModelManager
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("appLanguage") private var appLanguage = "en"
-    
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -22,7 +22,8 @@ struct ContentView: View {
                         .font(.largeTitle)
                         .bold()
                 }
-
+                .scaleEffect(1.5)
+                .padding(.bottom, 150)
                 Text(StringManager.shared.get("Index_banner"))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
@@ -54,13 +55,14 @@ struct ContentView: View {
                         Text(StringManager.shared.get("gotochat"))
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.gray.opacity(0.3))
+                            .background(isDarkMode ? Color.gray.opacity(0.3) : Color.gray.opacity(0.4))
                             .cornerRadius(10)
                     }
                 }
                 .padding(.horizontal)
             }
             .padding()
+            .id(modelManager.currentModelPath)
             .navigationTitle("")
             .preferredColorScheme(isDarkMode ? .dark : .light)
             .toolbar {

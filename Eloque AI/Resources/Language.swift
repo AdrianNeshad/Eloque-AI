@@ -41,6 +41,9 @@ class StringManager {
         "download": "Ladda ner",
         "chosemodel": "Vald modell:",
         "models": "AI-modeller",
+        "downloading": "Laddar ner...",
+        "delete": "Radera",
+        "size": "Storlek:",
     ]
     
     private let en: [String: String] = [
@@ -73,6 +76,9 @@ class StringManager {
         "download": "Download",
         "chosenmodel": "Chosen model:",
         "models": "AI-Models",
+        "downloading": "Downloading...",
+        "delete": "Delete",
+        "size": "Size:",
     ]
     
     private var tables: [String: [String: String]] {

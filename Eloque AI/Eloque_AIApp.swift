@@ -19,6 +19,14 @@ struct Eloque_AIApp: App {
             ContentView()
                 .environmentObject(modelManager)
                 .preferredColorScheme(isDarkMode ? .dark : .light)
+                .task {
+                    do {
+                        try await modelManager.loadAvailableModels()
+                        await modelManager.loadLastSelectedModel()
+                    } catch {
+                        print("Failed to load models or last selected model: \(error)")
+                    }
+                }
                 .onAppear {
                     if !hasLaunchedBefore {
                         setLanguageFromSystem()
@@ -27,22 +35,22 @@ struct Eloque_AIApp: App {
                     }
                 }
         }
-    } 
-    
+    }
+
     func setLanguageFromSystem() {
-            let preferred = Locale.preferredLanguages.first ?? "en"
-            if preferred.starts(with: "sv") {
-                appLanguage = "sv"
-            } else {
-                appLanguage = "en"
-            }
+        let preferred = Locale.preferredLanguages.first ?? "en"
+        if preferred.starts(with: "sv") {
+            appLanguage = "sv"
+        } else {
+            appLanguage = "en"
         }
-    
+    }
+
     func setDarkModeFromSystem() {
         if UITraitCollection.current.userInterfaceStyle == .dark {
-               isDarkMode = true
-           } else {
-               isDarkMode = false
-           }
+            isDarkMode = true
+        } else {
+            isDarkMode = false
+        }
     }
 }

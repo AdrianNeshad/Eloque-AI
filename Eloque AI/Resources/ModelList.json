@@ -3,12 +3,12 @@
     "name": "TinyLlama Q3_K_M",
     "url": "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q3_K_M.gguf",
     "sizeMB": 551,
-    "description": "Bra balans mellan kvalitet och minnesanvändning."
+    "description": "Great balance between quality and memory usage."
   },
   {
     "name": "TinyLlama Q4_K_S",
     "url": "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_S.gguf",
     "sizeMB": 644,
-    "description": "Högre kvalitet, något större fil."
+    "description": "Higher quality, somewhat larger file size"
   }
 ]

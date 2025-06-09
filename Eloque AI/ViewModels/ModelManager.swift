@@ -12,20 +12,21 @@ import SwiftUI
 @MainActor
 class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
     @AppStorage("appLanguage") private var appLanguage = "en"
+    @AppStorage("lastSelectedModel") private var lastSelectedModelName = ""
     @Published var availableModels: [LLMModelInfo] = []
     @Published var currentModel: LlamaInstance?
     @Published var downloadProgress: [String: Double] = [:]
+    @Published var isDownloading: [String: Bool] = [:]
     
     private var currentProfile: ModelProfile?
     let fileHelper = FileHelper()
+    private var downloadContinuations: [String: CheckedContinuation<URL, Error>] = [:]
 
-    // URLSession med delegat för progress
     private lazy var session: URLSession = {
         let config = URLSessionConfiguration.default
         return URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }()
     
-    // Ladda tillgängliga modeller från JSON
     func loadAvailableModels() async throws {
         guard let url = Bundle.main.url(forResource: "ModelList", withExtension: "json") else { return }
         let data = try Data(contentsOf: url)
@@ -34,79 +35,76 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
             self.availableModels = models
         }
     }
-
-    // Nedladdning med progress och async/await via continuation
-    func downloadModel(_ model: LLMModelInfo) async throws -> URL {
-        return try await withCheckedThrowingContinuation { continuation in
-            let downloadTask = session.downloadTask(with: model.url) { [weak self] localURL, _, error in
-                guard let self = self else { return }
-                if let error = error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-                guard let localURL = localURL else {
-                    continuation.resume(throwing: URLError(.badServerResponse))
-                    return
-                }
-                do {
-                    let destination = self.fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf")
-                    if FileManager.default.fileExists(atPath: destination.path) {
-                        try FileManager.default.removeItem(at: destination)
-                    }
-                    try FileManager.default.moveItem(at: localURL, to: destination)
-                    DispatchQueue.main.async {
-                        self.downloadProgress[model.name] = nil
-                    }
-                    continuation.resume(returning: destination)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
+    
+    // Public async function to load last selected model at app start
+    @MainActor
+    func loadLastSelectedModel() async {
+        guard !lastSelectedModelName.isEmpty else { return }
+        
+        let modelURL = fileHelper.modelsDirectory.appendingPathComponent("\(lastSelectedModelName).gguf")
+        
+        if FileManager.default.fileExists(atPath: modelURL.path) {
+            do {
+                try await loadModel(at: modelURL)
+                print("Loaded last selected model: \(lastSelectedModelName)")
+            } catch {
+                print("Failed to load last selected model: \(error)")
+                lastSelectedModelName = ""
             }
-            downloadTask.taskDescription = model.name
-            downloadTask.resume()
-            DispatchQueue.main.async {
-                self.downloadProgress[model.name] = 0.0
-            }
+        } else {
+            lastSelectedModelName = ""
         }
     }
 
-    // Ladda modellen i minnet (async, trådsäker)
+    func downloadModel(_ model: LLMModelInfo) async throws -> URL {
+        self.downloadProgress[model.name] = 0.0
+        self.isDownloading[model.name] = true
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            downloadContinuations[model.name] = continuation
+            
+            let downloadTask = session.downloadTask(with: model.url)
+            downloadTask.taskDescription = model.name
+            downloadTask.resume()
+        }
+    }
+
     func loadModel(at url: URL) async throws {
         let profile = ModelProfile(sourcePath: url.path, architecture: .llamaGeneral)
-        DispatchQueue.main.async {
-            self.currentProfile = profile
-        }
+        self.currentProfile = profile
+        
         let instance = await LlamaInstance(
             profile: profile,
             settings: InstanceSettings(),
             predictionConfig: PredictionConfig()
         )
-        DispatchQueue.main.async {
-            self.currentModel = instance
-        }
+        self.currentModel = instance
+        
+        // Spara namnet som senaste valda modell
+        let modelName = url.deletingPathExtension().lastPathComponent
+        lastSelectedModelName = modelName
     }
     
-    // Kontrollera om modellen är nedladdad (finns på disk)
     func isModelDownloaded(_ model: LLMModelInfo) -> Bool {
         let fileURL = fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf")
         return FileManager.default.fileExists(atPath: fileURL.path)
     }
     
-    // Radera nedladdad modell
     func deleteModel(_ model: LLMModelInfo) throws {
         let fileURL = fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf")
         if FileManager.default.fileExists(atPath: fileURL.path) {
             try FileManager.default.removeItem(at: fileURL)
+            
             if currentProfile?.sourcePath == fileURL.path {
-                DispatchQueue.main.async {
-                    self.currentProfile = nil
-                    self.currentModel = nil
-                }
+                self.currentProfile = nil
+                self.currentModel = nil
+            }
+            if lastSelectedModelName == model.name {
+                lastSelectedModelName = ""
             }
         }
     }
     
-    // Kontrollera om en modell är vald som aktiv
     func isModelSelected(_ model: LLMModelInfo) -> Bool {
         currentModelPath == fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf").path
     }
@@ -123,16 +121,49 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
                     totalBytesExpectedToWrite: Int64) {
         guard let modelName = downloadTask.taskDescription else { return }
         let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-        DispatchQueue.main.async {
+        
+        Task { @MainActor in
             self.downloadProgress[modelName] = progress
         }
     }
     
-    nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
                     didFinishDownloadingTo location: URL) {
-        guard let modelName = downloadTask.taskDescription else { return }
-        DispatchQueue.main.async {
+        guard let modelName = downloadTask.taskDescription,
+              let continuation = downloadContinuations[modelName] else { return }
+        
+        Task { @MainActor in
             self.downloadProgress[modelName] = nil
+            self.isDownloading[modelName] = false
+            self.downloadContinuations.removeValue(forKey: modelName)
+        }
+        
+        do {
+            let destination = fileHelper.modelsDirectory.appendingPathComponent("\(modelName).gguf")
+            
+            if FileManager.default.fileExists(atPath: destination.path) {
+                try FileManager.default.removeItem(at: destination)
+            }
+            
+            try FileManager.default.moveItem(at: location, to: destination)
+            
+            continuation.resume(returning: destination)
+        } catch {
+            continuation.resume(throwing: error)
+        }
+    }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        guard let modelName = task.taskDescription,
+              let continuation = downloadContinuations[modelName] else { return }
+        
+        if let error = error {
+            Task { @MainActor in
+                self.downloadProgress[modelName] = nil
+                self.isDownloading[modelName] = false
+                self.downloadContinuations.removeValue(forKey: modelName)
+            }
+            continuation.resume(throwing: error)
         }
     }
 }
