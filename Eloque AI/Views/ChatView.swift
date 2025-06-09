@@ -24,7 +24,7 @@ struct ChatView: View {
                             Text(msg.text)
                                 .padding()
                                 .background(msg.isFromUser ? Color.blue : Color.gray.opacity(0.3))
-                                .foregroundColor(msg.isFromUser ? .white : .black)
+                                .foregroundColor(msg.isFromUser ? .white : (isDarkMode ? .white : .black))
                                 .cornerRadius(16)
                             if !msg.isFromUser { Spacer() }
                         }
