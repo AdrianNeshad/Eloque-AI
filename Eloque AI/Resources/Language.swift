@@ -44,6 +44,8 @@ class StringManager {
         "downloading": "Laddar ner...",
         "delete": "Radera",
         "size": "Storlek:",
+        "choosemodelfirst": "Välj en modell först",
+        "choosemodelfirsttext": "Du måste ladda ner och välja en modell innan du kan använda chatten",
     ]
     
     private let en: [String: String] = [
@@ -79,6 +81,8 @@ class StringManager {
         "downloading": "Downloading...",
         "delete": "Delete",
         "size": "Size:",
+        "choosemodelfirst": "Choose a model first",
+        "choosemodelfirsttext": "You must download and choose a model before you can use the chat",
     ]
     
     private var tables: [String: [String: String]] {

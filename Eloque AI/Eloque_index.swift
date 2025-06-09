@@ -11,6 +11,8 @@ struct ContentView: View {
     @EnvironmentObject var modelManager: ModelManager
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("appLanguage") private var appLanguage = "en"
+    @State private var showNoModelAlert = false
+    @State private var showChatView = false
 
     var body: some View {
         NavigationStack {
@@ -50,13 +52,23 @@ struct ContentView: View {
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
-
-                    NavigationLink(destination: ChatView()) {
+                    Button {
+                        if modelManager.currentModelPath == nil {
+                            showNoModelAlert = true
+                        } else {
+                            showChatView = true
+                        }
+                    } label: {
                         Text(StringManager.shared.get("gotochat"))
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(isDarkMode ? Color.gray.opacity(0.3) : Color.gray.opacity(0.4))
                             .cornerRadius(10)
+                    }
+                    .alert(StringManager.shared.get("choosemodelfirst"), isPresented: $showNoModelAlert) {
+                        Button("OK", role: .cancel) {}
+                    } message: {
+                        Text(StringManager.shared.get("choosemodelfirsttext"))
                     }
                 }
                 .padding(.horizontal)
@@ -72,6 +84,9 @@ struct ContentView: View {
                             .foregroundColor(.blue)
                     }
                 }
+            }
+            .navigationDestination(isPresented: $showChatView) {
+                ChatView()
             }
         }
     }

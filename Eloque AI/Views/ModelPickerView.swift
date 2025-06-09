@@ -28,7 +28,7 @@ struct ModelPickerView: View {
                                         try await modelManager.loadModel(at: url)
                                     }
                                 } catch {
-                                    errorMessage = "Kunde inte ladda modellen: \(error.localizedDescription)"
+                                    errorMessage = "Couldn't load the model: \(error.localizedDescription)"
                                     showingErrorAlert = true
                                 }
                             }
@@ -100,20 +100,20 @@ struct ModelPickerView: View {
                                     do {
                                         try modelManager.deleteModel(model)
                                     } catch {
-                                        errorMessage = "Kunde inte radera modellen: \(error.localizedDescription)"
+                                        errorMessage = "Couldn't delete the model: \(error.localizedDescription)"
                                         showingErrorAlert = true
                                     }
                                 } label: {
                                     Label(StringManager.shared.get("delete"), systemImage: "trash")
                                 }
                             } else {
-                                Button(StringManager.shared.get("download")) {
+                                Button(StringManager.shared.get("download"), systemImage: "square.and.arrow.down") {
                                     Task {
                                         do {
                                             let url = try await modelManager.downloadModel(model)
                                             try await modelManager.loadModel(at: url)
                                         } catch {
-                                            errorMessage = "Nedladdningen misslyckades: \(error.localizedDescription)"
+                                            errorMessage = "Download failed: \(error.localizedDescription)"
                                             showingErrorAlert = true
                                         }
                                     }
