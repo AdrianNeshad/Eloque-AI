@@ -169,4 +169,21 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
             continuation.resume(throwing: error)
         }
     }
+    
+    func logAllModelFileSizes() {
+        let directory = fileHelper.modelsDirectory
+        do {
+            let files = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+            let ggufFiles = files.filter { $0.pathExtension == "gguf" }
+            for file in ggufFiles {
+                let attrs = try FileManager.default.attributesOfItem(atPath: file.path)
+                if let fileSize = attrs[.size] as? NSNumber {
+                    let sizeMB = Double(fileSize.intValue) / 1024 / 1024
+                    print("Model: \(file.lastPathComponent), Size: \(String(format: "%.2f", sizeMB)) MB")
+                }
+            }
+        } catch {
+            print("Failed to list model files: \(error)")
+        }
+    }
 }

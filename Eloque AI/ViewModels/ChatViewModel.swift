@@ -31,26 +31,39 @@ class ChatViewModel: ObservableObject {
                 return
             }
             
-            // --- Välj formatter beroende på filnamnet/modellnamnet ---
             let formatter: InteractionFormatting
             if path.contains("deepseek") || path.contains("zephyr") || path.contains("chatml") {
                 formatter = ChatMLInteractionFormatter()
             } else {
-                formatter = StandardInteractionFormatter() // eller vad din "default" heter
+                formatter = StandardInteractionFormatter()
             }
             
             do {
                 let profile = ModelProfile(sourcePath: path, architecture: .llamaGeneral)
-                let dialogue = [ Turn(role: .user, text: prompt) ]
-                
-                let stream = try await Kuzco.shared.predict(
-                    dialogue: dialogue,
-                    with: profile,
-                    instanceSettings: InstanceSettings(),
+                let instance = await LlamaInstance(
+                    profile: profile,
+                    settings: InstanceSettings(),
                     predictionConfig: PredictionConfig(),
-                    interactionFormatter: formatter // <-- Skicka in formattern här!
+                    formatter: formatter
                 )
 
+                let startupStream = await instance.startup()
+                var isReady = false
+                for await update in startupStream {
+                    if update.stage == .ready {
+                        isReady = true
+                        break
+                    } else if update.stage == .failed {
+                        throw NSError(domain: "Model failed to start", code: -1)
+                    }
+                }
+                guard isReady else {
+                    throw NSError(domain: "Model not ready after startup", code: -2)
+                }
+                
+                let dialogue = [ Turn(role: .user, text: prompt) ]
+                let stream = await instance.generate(dialogue: dialogue)
+                
                 var response = ""
                 for try await token in stream {
                     response += token

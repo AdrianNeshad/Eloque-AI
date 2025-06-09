@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import Kuzco
 
 class ChatMLInteractionFormatter: InteractionFormatting {
-    func constructPrompt(for dialogue: [Turn], modelArchitecture: ModelArchitecture, systemPrompt: String?) -> String {
+    func constructPrompt(for dialogue: [Turn], modelArchitecture: ModelArchitecture, systemPrompt: String?) -> String { 
         var prompt = ""
         if let systemPrompt = systemPrompt, !systemPrompt.isEmpty {
             prompt += "<|im_start|>system\n\(systemPrompt)\n<|im_end|>\n"
@@ -19,6 +20,8 @@ class ChatMLInteractionFormatter: InteractionFormatting {
                 prompt += "<|im_start|>user\n\(turn.text)\n<|im_end|>\n"
             case .assistant:
                 prompt += "<|im_start|>assistant\n\(turn.text)\n<|im_end|>\n"
+            default:
+                break
             }
         }
         prompt += "<|im_start|>assistant\n"
