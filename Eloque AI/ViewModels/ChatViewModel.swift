@@ -30,16 +30,25 @@ class ChatViewModel: ObservableObject {
                 partialResponse = nil
                 return
             }
-
+            
+            // --- Välj formatter beroende på filnamnet/modellnamnet ---
+            let formatter: InteractionFormatting
+            if path.contains("deepseek") || path.contains("zephyr") || path.contains("chatml") {
+                formatter = ChatMLInteractionFormatter()
+            } else {
+                formatter = StandardInteractionFormatter() // eller vad din "default" heter
+            }
+            
             do {
                 let profile = ModelProfile(sourcePath: path, architecture: .llamaGeneral)
                 let dialogue = [ Turn(role: .user, text: prompt) ]
-
+                
                 let stream = try await Kuzco.shared.predict(
                     dialogue: dialogue,
                     with: profile,
                     instanceSettings: InstanceSettings(),
-                    predictionConfig: PredictionConfig()
+                    predictionConfig: PredictionConfig(),
+                    interactionFormatter: formatter // <-- Skicka in formattern här!
                 )
 
                 var response = ""
@@ -49,7 +58,6 @@ class ChatViewModel: ObservableObject {
                         self.partialResponse = response
                     }
                 }
-
                 messages.append(ChatMessage(text: response, isFromUser: false))
             } catch {
                 messages.append(ChatMessage(text: "⚠️ Error: \(error.localizedDescription)", isFromUser: false))

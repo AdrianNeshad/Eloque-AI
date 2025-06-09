@@ -33,7 +33,7 @@ struct ContentView: View {
                 if let currentPath = modelManager.currentModelPath {
                     HStack {
                         Text(StringManager.shared.get("chosenmodel"))
-                        Text("\(URL(fileURLWithPath: currentPath).lastPathComponent)")
+                        Text("\(URL(fileURLWithPath: currentPath).lastPathComponent).gguf")
                             .font(.subheadline)
                             .foregroundColor(.green)
                     }

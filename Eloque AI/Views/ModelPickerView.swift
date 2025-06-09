@@ -23,7 +23,7 @@ struct ModelPickerView: View {
                         Button {
                             Task {
                                 do {
-                                    let url = modelManager.fileHelper.modelsDirectory.appendingPathComponent("\(model.name)")
+                                    let url = modelManager.fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf")
                                     if FileManager.default.fileExists(atPath: url.path) {
                                         try await modelManager.loadModel(at: url)
                                     }
