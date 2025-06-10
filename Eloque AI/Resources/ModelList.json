@@ -1,5 +1,5 @@
 [
-    {
+    {   
         "name": "Google Gemma-2-2B-IT Q4_K_M",
         "url": "https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q4_K_M.gguf?download=true",
         "sizeMB": 1751,

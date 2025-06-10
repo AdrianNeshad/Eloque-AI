@@ -4,10 +4,10 @@
 //
 //  Created by Adrian Neshad on 2025-06-09.
 //
-    
+
 import Foundation
 import Kuzco
-import SwiftUI // Make sure SwiftUI is imported if you use @AppStorage
+import SwiftUI
 
 @MainActor
 class ChatViewModel: ObservableObject {
@@ -15,9 +15,9 @@ class ChatViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = []
     @Published var isGenerating = false
     @Published var partialResponse: String? = nil
-    
+
     var modelPath: String?
-    
+
     func sendMessage(_ prompt: String, completion: (() -> Void)? = nil) {
         messages.append(ChatMessage(text: prompt, isFromUser: true))
         isGenerating = true
@@ -25,26 +25,40 @@ class ChatViewModel: ObservableObject {
 
         Task {
             guard let path = modelPath else {
-                messages.append(ChatMessage(text: "⚠️ No model chosen", isFromUser: false))
+                messages.append(ChatMessage(text: "⚠️ n", isFromUser: false))
                 isGenerating = false
                 partialResponse = nil
                 completion?()
                 return
             }
-            
+
             let formatter: InteractionFormatting
-            if path.contains("deepseek") || path.contains("zephyr") || path.contains("chatml") {
+            let modelArchitecture: ModelArchitecture
+            if path.contains("deepseek") || path.contains("zephyr") {
                 formatter = ChatMLInteractionFormatter()
+                modelArchitecture = .openChat
+            } else if path.contains("mixtral") || path.contains("llama") {
+                formatter = StandardInteractionFormatter()
+                modelArchitecture = .llamaGeneral
+            } else if path.contains("phi-3") {
+                formatter = StandardInteractionFormatter()
+                modelArchitecture = .phiGeneric
+            } else if path.contains("gemma") {
+                formatter = StandardInteractionFormatter()
+                modelArchitecture = .gemmaInstruct
             } else {
                 formatter = StandardInteractionFormatter()
+                modelArchitecture = .llamaGeneral
             }
-            
+
             do {
-                let profile = ModelProfile(sourcePath: path, architecture: .llamaGeneral)
+                let profile = ModelProfile(sourcePath: path, architecture: modelArchitecture)
+                var predictionConfig = PredictionConfig()
+
                 let instance = await LlamaInstance(
                     profile: profile,
                     settings: InstanceSettings(),
-                    predictionConfig: PredictionConfig(),
+                    predictionConfig: predictionConfig,
                     formatter: formatter
                 )
 
@@ -61,10 +75,10 @@ class ChatViewModel: ObservableObject {
                 guard isReady else {
                     throw NSError(domain: "Model not ready after startup", code: -2)
                 }
-                
+
                 let dialogue = [ Turn(role: .user, text: prompt) ]
                 let stream = await instance.generate(dialogue: dialogue)
-                
+
                 var response = ""
                 for try await token in stream {
                     response += token
@@ -81,11 +95,11 @@ class ChatViewModel: ObservableObject {
             completion?()
         }
     }
-    
+
     func loadChat(_ chatHistory: ChatHistory) {
         messages = chatHistory.messages
     }
-    
+
     func clearMessages() {
         messages.removeAll()
         partialResponse = nil
