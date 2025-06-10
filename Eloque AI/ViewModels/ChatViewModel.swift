@@ -53,7 +53,7 @@ class ChatViewModel: ObservableObject {
 
             do {
                 let profile = ModelProfile(sourcePath: path, architecture: modelArchitecture)
-                var predictionConfig = PredictionConfig()
+                let predictionConfig = PredictionConfig()
 
                 let instance = await LlamaInstance(
                     profile: profile,

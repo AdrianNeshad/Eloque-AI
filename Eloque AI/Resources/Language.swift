@@ -48,6 +48,7 @@ class StringManager {
         "choosemodelfirsttext": "Du måste ladda ner och välja en modell innan du kan använda chatten",
         "chathistory": "Chatthistorik",
         "thinking": "Tänker",
+        "recommended": "Rekommenderad enhet:",
     ]
     
     private let en: [String: String] = [
@@ -87,6 +88,7 @@ class StringManager {
         "choosemodelfirsttext": "You must download and choose a model before you can use the chat",
         "chathistory": "Chat history",
         "thinking": "Thinking",
+        "recommended": "Recommended device:",
     ]
     
     private var tables: [String: [String: String]] {

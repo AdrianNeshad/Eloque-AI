@@ -1,8 +1,8 @@
 //
-//  ModelPickerView.swift
-//  Eloque AI
+//  ModelPickerView.swift
+//  Eloque AI
 //
-//  Created by Adrian Neshad on 2025-06-09.
+//  Created by Adrian Neshad on 2025-06-09.
 //
 
 import SwiftUI
@@ -14,7 +14,7 @@ struct ModelPickerView: View {
     
     @State private var errorMessage: String? = nil
     @State private var showingErrorAlert = false
-     
+    
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
@@ -46,12 +46,15 @@ struct ModelPickerView: View {
                                 Text(model.description)
                                     .font(.subheadline)
                                     .padding(.bottom, 10)
+                                
                                 HStack {
                                     Text(StringManager.shared.get("size"))
                                     Text("\(model.sizeMB)")
                                         .padding(.leading, -5)
                                     Text("MB")
                                         .padding(.leading, -5)
+                                    Spacer()
+                                    Text(StringManager.shared.get("recommended"))
                                 }
                                 .font(.subheadline)
                                 .padding(.bottom, -12)
@@ -60,7 +63,7 @@ struct ModelPickerView: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(modelManager.isDownloading[model.name] == true)
-                        
+                        HStack(spacing: 8) {
                         HStack {
                             if let progress = modelManager.downloadProgress[model.name] {
                                 VStack(alignment: .leading, spacing: 4) {
@@ -121,6 +124,14 @@ struct ModelPickerView: View {
                                 .foregroundColor(.blue)
                             }
                             Spacer()
+                                ForEach(model.compatibleDevices, id: \.self) { device in
+                                    if let iconName = model.systemIconName(for: device) {
+                                        Image(systemName: iconName)
+                                            .font(.caption)
+                                            .foregroundColor(.blue)
+                                    }
+                                }
+                            }
                         }
                         .padding(.top, 8)
                     }
@@ -138,7 +149,7 @@ struct ModelPickerView: View {
         }
         .task {
             try? await modelManager.loadAvailableModels()
-        } 
+        }
         .navigationTitle(StringManager.shared.get("models"))
         .alert("Error", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) {}
