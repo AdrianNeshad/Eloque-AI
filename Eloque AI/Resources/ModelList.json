@@ -1,74 +1,26 @@
 [
-  {
-    "name": "TinyLlama Q3_K_M",
-    "url": "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q3_K_M.gguf",
-    "sizeMB": 551,
-    "description": "Great balance between quality and memory usage."
-  },
-  {
-    "name": "TinyLlama Q4_K_S",
-    "url": "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_S.gguf",
-    "sizeMB": 644,
-    "description": "Higher quality, somewhat larger file size"
-  },
-  {
-    "name": "DeepSeek LLM 7B Q4_K_M",
-    "url": "https://huggingface.co/TheBloke/deepseek-llm-7B-chat-GGUF/resolve/main/deepseek-llm-7b-chat.Q4_K_M.gguf",
-    "sizeMB": 4367,
-    "description": "Large general-purpose model. Powerful and well-balanced."
-  },
-  {
-    "name": "Mixtral-8x7B-Instruct Q4_K_M",
-    "url": "https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf",
-    "sizeMB": 4774,
-    "description": "Very powerful Mixture-of-Experts model. Handles complex tasks and long contexts."
-  },
-  {
-    "name": "Zephyr-7B-beta Q4_K_M",
-    "url": "https://huggingface.co/TheBloke/zephyr-7B-beta-GGUF/resolve/main/zephyr-7b-beta.Q4_K_M.gguf",
-    "sizeMB": 4076,
-    "description": "Community favorite. Fast and instruction-tuned for chat and creative tasks."
-  },
-  {
-    "name": "Google Gemma-2B Q4_K_M",
-    "url": "https://huggingface.co/TheBloke/gemma-2b-GGUF/resolve/main/gemma-2b.Q4_K_M.gguf",
-    "sizeMB": 2235,
-    "description": "Google's efficient and strong model. Performs well on mobile hardware."
-  },
-  {
-    "name": "Microsoft Phi-3-mini Q4_K_M",
-    "url": "https://huggingface.co/TheBloke/phi-3-mini-4k-instruct-GGUF/resolve/main/phi-3-mini-4k-instruct.Q4_K_M.gguf",
-    "sizeMB": 3702,
-    "description": "Microsoft's state-of-the-art compact model. Very strong at reasoning and coding."
-  },
     {
-      "name": "DeepSeek LLM 7B Q2_K",
-      "url": "https://huggingface.co/TheBloke/deepseek-llm-7B-chat-GGUF/resolve/main/deepseek-llm-7b-chat.Q2_K.gguf",
-      "sizeMB": 3057,
-      "description": "Smallest DeepSeek 7B, Q2_K quantization. Minimal RAM-krav, men sämst kvalitet."
+        "name": "Google Gemma-2-2B-IT Q4_K_M",
+        "url": "https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q4_K_M.gguf?download=true",
+        "sizeMB": 1751,
+        "description": "Googles nya Gemma 2B, instruktionsfinjusterad. Optimerad för prestanda och kvalitet på mobila enheter."
     },
     {
-      "name": "DeepSeek LLM 7B Q3_K_S",
-      "url": "https://huggingface.co/TheBloke/deepseek-llm-7B-chat-GGUF/resolve/main/deepseek-llm-7b-chat.Q3_K_S.gguf",
-      "sizeMB": 3212,
-      "description": "Väldigt kompakt Q3_K_S, lite bättre kvalitet än Q2. Låg RAM-förbrukning."
+        "name": "Microsoft Phi-3.5-mini-4K Q3_K_L",
+        "url": "https://huggingface.co/bartowski/Phi-3-mini-4k-instruct-GGUF/resolve/main/Phi-3-mini-4k-instruct-Q3_K_L.gguf?download=true",
+        "sizeMB": 2077,
+        "description": "Microsofts senaste Phi-3.5-modell, instruktionsfinjusterad för 4k kontext."
     },
     {
-      "name": "DeepSeek LLM 7B Q3_K_M",
-      "url": "https://huggingface.co/TheBloke/deepseek-llm-7B-chat-GGUF/resolve/main/deepseek-llm-7b-chat.Q3_K_M.gguf",
-      "sizeMB": 3547,
-      "description": "Bäst balans av småmodeller. Q3_K_M, bra om du får minnesproblem på Q4."
+        "name": "Llama 3.2-1B-Instruct Q8_0",
+        "url": "https://huggingface.co/hugging-quants/Llama-3.2-1B-Instruct-Q8_0-GGUF/resolve/main/llama-3.2-1b-instruct-q8_0.gguf?download=true",
+        "sizeMB": 1352,
+        "description": "En instruktionsfinjusterad version av Llama 3.2, 1 miljard parametrar, Q8_0 kvantisering för hög kvalitet."
     },
     {
-      "name": "DeepSeek LLM 7B Q3_K_L",
-      "url": "https://huggingface.co/TheBloke/deepseek-llm-7B-chat-GGUF/resolve/main/deepseek-llm-7b-chat.Q3_K_L.gguf",
-      "sizeMB": 3827,
-      "description": "Lite större än Q3_K_M, aningen bättre kvalitet men högre RAM."
-    },
-    {
-      "name": "DeepSeek LLM 7B Q4_K_S",
-      "url": "https://huggingface.co/TheBloke/deepseek-llm-7B-chat-GGUF/resolve/main/deepseek-llm-7b-chat.Q4_K_S.gguf",
-      "sizeMB": 4116,
-      "description": "Q4_K_S, standardval för låg RAM. Högre kvalitet än Q3, men kräver mer minne."
-    },
+        "name": "Llama 3.2-3B Q6_K",
+        "url": "https://huggingface.co/mradermacher/Brian-Llama-3.2-3B-GGUF/resolve/main/Brian-Llama-3.2-3B.Q6_K.gguf?download=true",
+        "sizeMB": 2765,
+        "description": "Llama 3.2, 3 miljarder parametrar, Q6_K kvantisering för bra balans mellan kvalitet och prestanda."
+    }
 ]

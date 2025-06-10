@@ -1,5 +1,5 @@
 {
-  "originHash" : "5a25075edd951a5b4e830e258e9ff6adfd89da9f47a76cfd0f690d821e0dacff",
+  "originHash" : "2d58ff36e3680fce3a2efd3c3a542e0917b3a9201a8db05ca526f5f08f78403c",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -16,7 +16,7 @@
       "location" : "https://github.com/jaredcassoutt/Kuzco",
       "state" : {
         "branch" : "main",
-        "revision" : "c5e48d42c3c5e54c6cd38adb2d53b987d81d0dcd"
+        "revision" : "fe08571f5bcc441af53ac1dc0bb4f338101304c9"
       }
     },
     {
