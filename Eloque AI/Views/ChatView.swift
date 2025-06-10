@@ -161,10 +161,14 @@ struct DotsAnimationView: View {
     let timer = Timer.publish(every: 0.4, on: .main, in: .common).autoconnect()
     
     var body: some View {
-        Text(String(repeating: ".", count: dotCount + 1))
-            .font(.body.bold())
-            .onReceive(timer) { _ in
-                dotCount = (dotCount + 1) % 3
-            }
+        HStack {
+            Text(StringManager.shared.get("thinking"))
+            Text(String(repeating: ".", count: dotCount + 1))
+                .font(.body.bold())
+                .onReceive(timer) { _ in
+                    dotCount = (dotCount + 1) % 3
+                }
+                .padding(.leading, -5)
+        }
     }
 }

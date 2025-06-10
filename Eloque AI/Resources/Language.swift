@@ -39,7 +39,7 @@ class StringManager {
         "chat": "Chatt",
         "send": "Skicka",
         "download": "Ladda ner",
-        "chosemodel": "Vald modell:",
+        "chosenmodel": "Vald modell:",
         "models": "AI-modeller",
         "downloading": "Laddar ner...",
         "delete": "Radera",
@@ -47,6 +47,7 @@ class StringManager {
         "choosemodelfirst": "Välj en modell först",
         "choosemodelfirsttext": "Du måste ladda ner och välja en modell innan du kan använda chatten",
         "chathistory": "Chatthistorik",
+        "thinking": "Tänker",
     ]
     
     private let en: [String: String] = [
@@ -85,6 +86,7 @@ class StringManager {
         "choosemodelfirst": "Choose a model first",
         "choosemodelfirsttext": "You must download and choose a model before you can use the chat",
         "chathistory": "Chat history",
+        "thinking": "Thinking",
     ]
     
     private var tables: [String: [String: String]] {
