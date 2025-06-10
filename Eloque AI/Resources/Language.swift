@@ -46,6 +46,7 @@ class StringManager {
         "size": "Storlek:",
         "choosemodelfirst": "Välj en modell först",
         "choosemodelfirsttext": "Du måste ladda ner och välja en modell innan du kan använda chatten",
+        "chathistory": "Chatthistorik",
     ]
     
     private let en: [String: String] = [
@@ -83,6 +84,7 @@ class StringManager {
         "size": "Size:",
         "choosemodelfirst": "Choose a model first",
         "choosemodelfirsttext": "You must download and choose a model before you can use the chat",
+        "chathistory": "Chat history",
     ]
     
     private var tables: [String: [String: String]] {

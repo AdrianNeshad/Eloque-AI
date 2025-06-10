@@ -1,8 +1,8 @@
 //
-//  ChatView.swift
-//  Eloque AI
+//  ChatView.swift
+//  Eloque AI
 //
-//  Created by Adrian Neshad on 2025-06-09.
+//  Created by Adrian Neshad on 2025-06-09.
 //
 
 import SwiftUI
@@ -21,7 +21,8 @@ struct ChatView: View {
     @State private var lastContentOffset: CGFloat = 0
     @State private var showSaveAlert = false
     @Environment(\.dismiss) private var dismiss
-
+    @State private var currentChatID: UUID?
+    
     var body: some View {
         VStack {
             ScrollViewReader { proxy in
@@ -83,6 +84,7 @@ struct ChatView: View {
                 .onChange(of: viewModel.messages.count) {
                     isUserScrollingManually = false
                     proxy.scrollTo("BottomID", anchor: .bottom)
+                    saveCurrentChat()
                 }
                 .onChange(of: viewModel.partialResponse) {
                     if !isUserScrollingManually {
@@ -90,19 +92,16 @@ struct ChatView: View {
                     }
                 }
             }
-
+            
             HStack {
                 TextField("Prompt...", text: $inputText)
                     .textFieldStyle(.roundedBorder)
                     .disabled(viewModel.isGenerating)
                     .focused($isInputFieldFocused)
-
+                
                 Button(StringManager.shared.get("send")) {
                     viewModel.modelPath = modelManager.currentModelPath
                     viewModel.sendMessage(inputText) {
-                        if viewModel.messages.count == 2 {
-                            saveCurrentChat()
-                        }
                     }
                     inputText = ""
                 }
@@ -113,11 +112,25 @@ struct ChatView: View {
         .navigationTitle(StringManager.shared.get("chat"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            viewModel.modelPath = modelManager.currentModelPath
-            
             if let loadedChat = loadedChat {
                 viewModel.loadChat(loadedChat)
+                currentChatID = loadedChat.id
+                Task {
+                    do {
+                        let modelURL = modelManager.fileHelper.modelsDirectory.appendingPathComponent("\(loadedChat.modelName).gguf")
+                        if FileManager.default.fileExists(atPath: modelURL.path) {
+                            try await modelManager.loadModel(at: modelURL)
+                        } else {
+                            print("Model file for loaded chat not found: \(modelURL.lastPathComponent)")
+                        }
+                    } catch {
+                        print("Failed to load model for loaded chat: \(error.localizedDescription)")
+                    }
+                }
+            } else {
+                currentChatID = nil
             }
+            viewModel.modelPath = modelManager.currentModelPath
         }
     }
     
@@ -126,7 +139,13 @@ struct ChatView: View {
               let modelPath = modelManager.currentModelPath else { return }
         
         let modelName = URL(fileURLWithPath: modelPath).deletingPathExtension().lastPathComponent
-        chatHistoryManager.saveChat(messages: viewModel.messages, modelName: modelName)
+        
+        chatHistoryManager.saveChat(id: currentChatID, messages: viewModel.messages, modelName: modelName)
+        
+        if currentChatID == nil, let firstChat = chatHistoryManager.savedChats.first {
+            currentChatID = firstChat.id
+            print("Assigned new chat ID: \(currentChatID!)")
+        }
     }
 }
 
@@ -140,7 +159,7 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
 struct DotsAnimationView: View {
     @State private var dotCount = 0
     let timer = Timer.publish(every: 0.4, on: .main, in: .common).autoconnect()
-
+    
     var body: some View {
         Text(String(repeating: ".", count: dotCount + 1))
             .font(.body.bold())

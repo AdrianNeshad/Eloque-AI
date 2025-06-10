@@ -74,7 +74,6 @@ struct ContentView: View {
                         Text(StringManager.shared.get("choosemodelfirsttext"))
                     }
                     
-                    // Chatthistorik sektion
                     if !chatHistoryManager.savedChats.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
@@ -82,11 +81,8 @@ struct ContentView: View {
                                     .font(.headline)
                                     .padding(.leading, 4)
                                 Spacer()
-                                Button(StringManager.shared.get("clearall")) {
-                                    chatHistoryManager.clearAllChats()
-                                }
+                                Text("(Max 2)")
                                 .font(.caption)
-                                .foregroundColor(.red)
                             }
                             
                             ForEach(chatHistoryManager.savedChats) { chat in
