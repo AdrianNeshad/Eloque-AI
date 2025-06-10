@@ -71,11 +71,4 @@
       "sizeMB": 4116,
       "description": "Q4_K_S, standardval för låg RAM. Högre kvalitet än Q3, men kräver mer minne."
     },
-    {
-      "name": "DeepSeek LLM 7B Q4_K_M",
-      "url": "https://huggingface.co/TheBloke/deepseek-llm-7B-chat-GGUF/resolve/main/deepseek-llm-7b-chat.Q4_K_M.gguf",
-      "sizeMB": 4324,
-      "description": "Rekommenderad om du har tillräckligt RAM. Bra kvalitet och prestanda."
-    }
-
 ]

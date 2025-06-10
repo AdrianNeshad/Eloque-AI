@@ -9,10 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var modelManager: ModelManager
+    @StateObject private var chatHistoryManager = ChatHistoryManager()
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("appLanguage") private var appLanguage = "en"
     @State private var showNoModelAlert = false
     @State private var showChatView = false
+    @State private var selectedChat: ChatHistory?
 
     var body: some View {
         NavigationStack {
@@ -33,7 +35,7 @@ struct ContentView: View {
                 if let currentPath = modelManager.currentModelPath {
                     HStack {
                         Text(StringManager.shared.get("chosenmodel"))
-                        Text("\(URL(fileURLWithPath: currentPath).lastPathComponent).gguf")
+                        Text("\(URL(fileURLWithPath: currentPath).lastPathComponent)")
                             .font(.subheadline)
                             .foregroundColor(.green)
                     }
@@ -56,6 +58,7 @@ struct ContentView: View {
                         if modelManager.currentModelPath == nil {
                             showNoModelAlert = true
                         } else {
+                            selectedChat = nil
                             showChatView = true
                         }
                     } label: {
@@ -69,6 +72,70 @@ struct ContentView: View {
                         Button("OK", role: .cancel) {}
                     } message: {
                         Text(StringManager.shared.get("choosemodelfirsttext"))
+                    }
+                    
+                    // Chatthistorik sektion
+                    if !chatHistoryManager.savedChats.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text(StringManager.shared.get("chathistory"))
+                                    .font(.headline)
+                                    .padding(.leading, 4)
+                                Spacer()
+                                Button(StringManager.shared.get("clearall")) {
+                                    chatHistoryManager.clearAllChats()
+                                }
+                                .font(.caption)
+                                .foregroundColor(.red)
+                            }
+                            
+                            ForEach(chatHistoryManager.savedChats) { chat in
+                                Button {
+                                    if modelManager.currentModelPath == nil {
+                                        showNoModelAlert = true
+                                    } else {
+                                        selectedChat = chat
+                                        showChatView = true
+                                    }
+                                } label: {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(chat.title)
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                                .multilineTextAlignment(.leading)
+                                                .lineLimit(1)
+                                            
+                                            HStack {
+                                                Text(chat.modelName)
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                                Spacer()
+                                                Text(formatDate(chat.createdAt))
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                        }
+                                        Spacer()
+                                        Button {
+                                            chatHistoryManager.deleteChat(chat)
+                                        } label: {
+                                            Image(systemName: "trash")
+                                                .foregroundColor(.red)
+                                                .font(.caption)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                    .padding()
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(isDarkMode ? Color.gray.opacity(0.2) : Color.gray.opacity(0.1))
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.top, 8)
                     }
                 }
                 .padding(.horizontal)
@@ -86,9 +153,20 @@ struct ContentView: View {
                 }
             }
             .navigationDestination(isPresented: $showChatView) {
-                ChatView()
+                ChatView(
+                    chatHistoryManager: chatHistoryManager,
+                    loadedChat: selectedChat
+                )
             }
         }
+        .environmentObject(chatHistoryManager)
+    }
+    
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 }
 

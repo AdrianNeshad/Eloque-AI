@@ -4,7 +4,7 @@
 //
 //  Created by Adrian Neshad on 2025-06-09.
 //
-
+/*
 import Foundation
 
 struct ChatMessage: Identifiable {
@@ -12,3 +12,4 @@ struct ChatMessage: Identifiable {
     let text: String
     let isFromUser: Bool
 }
+*/

@@ -10,12 +10,17 @@ import SwiftUI
 struct ChatView: View {
     @EnvironmentObject var modelManager: ModelManager
     @StateObject var viewModel = ChatViewModel()
+    @ObservedObject var chatHistoryManager: ChatHistoryManager
+    let loadedChat: ChatHistory?
+    
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("appLanguage") private var appLanguage = "en"
     @State private var inputText = ""
     @State private var isUserScrollingManually = false
     @FocusState private var isInputFieldFocused: Bool
     @State private var lastContentOffset: CGFloat = 0
+    @State private var showSaveAlert = false
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack {
@@ -70,9 +75,8 @@ struct ChatView: View {
                     }
                 )
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { newOffset in
-                    // Detektera uppåt-scroll
                     if newOffset > lastContentOffset && isInputFieldFocused {
-                        isInputFieldFocused = false // fäll ner tangentbordet
+                        isInputFieldFocused = false
                     }
                     lastContentOffset = newOffset
                 }
@@ -95,7 +99,11 @@ struct ChatView: View {
 
                 Button(StringManager.shared.get("send")) {
                     viewModel.modelPath = modelManager.currentModelPath
-                    viewModel.sendMessage(inputText)
+                    viewModel.sendMessage(inputText) {
+                        if viewModel.messages.count == 2 {
+                            saveCurrentChat()
+                        }
+                    }
                     inputText = ""
                 }
                 .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isGenerating)
@@ -103,10 +111,25 @@ struct ChatView: View {
             .padding()
         }
         .navigationTitle(StringManager.shared.get("chat"))
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            viewModel.modelPath = modelManager.currentModelPath
+            
+            if let loadedChat = loadedChat {
+                viewModel.loadChat(loadedChat)
+            }
+        }
+    }
+    
+    private func saveCurrentChat() {
+        guard !viewModel.messages.isEmpty,
+              let modelPath = modelManager.currentModelPath else { return }
+        
+        let modelName = URL(fileURLWithPath: modelPath).deletingPathExtension().lastPathComponent
+        chatHistoryManager.saveChat(messages: viewModel.messages, modelName: modelName)
     }
 }
 
-// PreferenceKey för scrolloffset
 struct ScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {

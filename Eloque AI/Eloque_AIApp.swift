@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct Eloque_AIApp: App {
     @StateObject var modelManager = ModelManager()
+    @StateObject var chatHistoryManager = ChatHistoryManager()
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("appLanguage") private var appLanguage = "en"
     @AppStorage("hasLaunchedBefore") private var hasLaunchedBefore = false
@@ -18,6 +19,7 @@ struct Eloque_AIApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(modelManager)
+                .environmentObject(chatHistoryManager)
                 .preferredColorScheme(isDarkMode ? .dark : .light)
                 .task {
                     do {

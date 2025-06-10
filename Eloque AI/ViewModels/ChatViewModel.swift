@@ -7,7 +7,7 @@
     
 import Foundation
 import Kuzco
-import SwiftUI
+import SwiftUI // Make sure SwiftUI is imported if you use @AppStorage
 
 @MainActor
 class ChatViewModel: ObservableObject {
@@ -17,8 +17,8 @@ class ChatViewModel: ObservableObject {
     @Published var partialResponse: String? = nil
     
     var modelPath: String?
-
-    func sendMessage(_ prompt: String) {
+    
+    func sendMessage(_ prompt: String, completion: (() -> Void)? = nil) {
         messages.append(ChatMessage(text: prompt, isFromUser: true))
         isGenerating = true
         partialResponse = ""
@@ -28,6 +28,7 @@ class ChatViewModel: ObservableObject {
                 messages.append(ChatMessage(text: "⚠️ No model chosen", isFromUser: false))
                 isGenerating = false
                 partialResponse = nil
+                completion?()
                 return
             }
             
@@ -77,6 +78,16 @@ class ChatViewModel: ObservableObject {
             }
             isGenerating = false
             partialResponse = nil
+            completion?()
         }
+    }
+    
+    func loadChat(_ chatHistory: ChatHistory) {
+        messages = chatHistory.messages
+    }
+    
+    func clearMessages() {
+        messages.removeAll()
+        partialResponse = nil
     }
 }
