@@ -112,7 +112,7 @@ struct Settings: View {
                                }
                                .sheet(isPresented: $showShareSheet) {
                                    let message = StringManager.shared.get("checkouteloque")
-                                   let appLink = URL(string: "https://apps.apple.com/us/app/univert/id6745692591")!
+                                   let appLink = URL(string: "https://apps.apple.com/us/app/eloque-ai-local-llm/id6747086799")!
                                    ShareSheet(activityItems: [message, appLink])
                                        .presentationDetents([.medium])
                                }
