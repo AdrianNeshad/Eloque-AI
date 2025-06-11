@@ -39,6 +39,7 @@ struct ContentView: View {
                         Text("\(URL(fileURLWithPath: currentPath).lastPathComponent)")
                             .font(.subheadline)
                             .foregroundColor(.green)
+                            .lineLimit(2)
                     }
                 } else {
                     Text(StringManager.shared.get("nomodelchosen"))
