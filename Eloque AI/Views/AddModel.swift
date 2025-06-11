@@ -14,7 +14,7 @@ struct AddModel: View {
     @State private var selectedFileURL: URL? = nil
     @State private var showingFileImporter = false
     @State private var modelName = ""
-    @State private var description = "Custom local model"
+    @State private var description = "Custom LLM\n"
     @State private var selectedArchitecture: ModelArchitectureType? = nil
     @State private var sizeMB: Int = 0
     @State private var errorMessage: String? = nil
@@ -123,7 +123,7 @@ struct AddModel: View {
                 name: modelName,
                 url: destination,
                 sizeMB: sizeMB,
-                description: description + " (\(arch.rawValue))",
+                description: description + "(\(arch.rawValue))",
                 compatibility: "custom"
             )
             modelManager.availableModels.append(newModel)

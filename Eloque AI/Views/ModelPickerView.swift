@@ -19,35 +19,18 @@ struct ModelPickerView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 ForEach(modelManager.availableModels) { model in
-                    VStack(alignment: .leading) {
-                        Button {
-                            Task {
-                                do {
-                                    let url = modelManager.fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf")
-                                    if FileManager.default.fileExists(atPath: url.path) {
-                                        try await modelManager.loadModel(at: url)
-                                    }
-                                } catch {
-                                    errorMessage = "Couldn't load the model: \(error.localizedDescription)"
-                                    showingErrorAlert = true
-                                }
-                            }
-                        } label: {
+                    ZStack(alignment: .topTrailing) {
+                        VStack(alignment: .leading, spacing: 0) {
                             VStack(alignment: .leading) {
-                                HStack(spacing: 0) {
-                                    if modelManager.isModelSelected(model) {
-                                        Label("", systemImage: "checkmark.seal.fill")
-                                            .foregroundColor(.green)
-                                    }
-                                    Text(model.name)
-                                        .font(.title)
-                                        .bold()
-                                        .padding(.bottom, 5)
-                                }
+                                Text(model.name)
+                                    .font(.title)
+                                    .bold()
+                                    .padding(.bottom, 5)
+                                
                                 Text(model.description)
                                     .font(.subheadline)
                                     .padding(.bottom, 10)
-                                
+                                 
                                 HStack {
                                     Text(StringManager.shared.get("size"))
                                     Text("\(model.sizeMB)")
@@ -61,70 +44,67 @@ struct ModelPickerView: View {
                                 .padding(.bottom, -12)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(modelManager.isDownloading[model.name] == true)
-                        HStack(spacing: 8) {
-                        HStack {
-                            if let progress = modelManager.downloadProgress[model.name] {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    HStack(spacing: 8) {
-                                        ProgressView(value: progress)
-                                            .progressViewStyle(LinearProgressViewStyle(tint: .blue))
-                                            .frame(height: 6)
-                                            .scaleEffect(y: 1.5)
-                                        
-                                        Text("\(Int(progress * 100))%")
+                            .padding([.horizontal, .top])
+                            HStack(spacing: 8) {
+                                if let progress = modelManager.downloadProgress[model.name] {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        HStack(spacing: 8) {
+                                            ProgressView(value: progress)
+                                                .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                                                .frame(height: 6)
+                                                .scaleEffect(y: 1.5)
+                                            
+                                            Text("\(Int(progress * 100))%")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                                .monospacedDigit()
+                                        }
+                                        Text(StringManager.shared.get("downloading"))
                                             .font(.caption)
                                             .foregroundColor(.secondary)
-                                            .monospacedDigit()
                                     }
-                                    Text(StringManager.shared.get("downloading"))
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                            } else if modelManager.isDownloading[model.name] == true {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    HStack(spacing: 8) {
-                                        ProgressView()
-                                            .progressViewStyle(LinearProgressViewStyle(tint: .blue))
-                                            .frame(height: 6)
-                                        
-                                        Text("0%")
+                                } else if modelManager.isDownloading[model.name] == true {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        HStack(spacing: 8) {
+                                            ProgressView()
+                                                .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                                                .frame(height: 6)
+                                            
+                                            Text("0%")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                                .monospacedDigit()
+                                        }
+                                        Text(StringManager.shared.get("downloading"))
                                             .font(.caption)
                                             .foregroundColor(.secondary)
-                                            .monospacedDigit()
                                     }
-                                    Text(StringManager.shared.get("downloading"))
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                            } else if modelManager.isModelDownloaded(model) {
-                                Button(role: .destructive) {
-                                    do {
-                                        try modelManager.deleteModel(model)
-                                    } catch {
-                                        errorMessage = "Couldn't delete the model: \(error.localizedDescription)"
-                                        showingErrorAlert = true
-                                    }
-                                } label: {
-                                    Label(StringManager.shared.get("delete"), systemImage: "trash")
-                                }
-                            } else {
-                                Button(StringManager.shared.get("download"), systemImage: "square.and.arrow.down") {
-                                    Task {
+                                } else if modelManager.isModelDownloaded(model) {
+                                    Button(role: .destructive) {
                                         do {
-                                            let url = try await modelManager.downloadModel(model)
-                                            try await modelManager.loadModel(at: url)
+                                            try modelManager.deleteModel(model)
                                         } catch {
-                                            errorMessage = "Download failed: \(error.localizedDescription)"
+                                            errorMessage = "Kunde inte radera modellen: \(error.localizedDescription)"
                                             showingErrorAlert = true
                                         }
+                                    } label: {
+                                        Label(StringManager.shared.get("delete"), systemImage: "trash")
                                     }
+                                } else {
+                                    Button(StringManager.shared.get("download"), systemImage: "square.and.arrow.down") {
+                                        Task {
+                                            do {
+                                                _ = try await modelManager.downloadModel(model)
+                                            } catch {
+                                                errorMessage = "Nedladdning misslyckades: \(error.localizedDescription)"
+                                                showingErrorAlert = true
+                                            }
+                                        }
+                                    }
+                                    .foregroundColor(.blue)
                                 }
-                                .foregroundColor(.blue)
-                            }
-                            Spacer()
+                                Spacer()
+                                
                                 ForEach(model.compatibleDevices, id: \.self) { device in
                                     if let iconName = model.systemIconName(for: device) {
                                         Image(systemName: iconName)
@@ -133,16 +113,36 @@ struct ModelPickerView: View {
                                     }
                                 }
                             }
+                            .padding([.horizontal, .bottom])
+                            .padding(.top, 20)
                         }
-                        .padding(.top, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(isDarkMode ? Color(.secondarySystemBackground) : Color.gray.opacity(0.2))
+                                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                        )
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            if modelManager.isModelDownloaded(model) && modelManager.isDownloading[model.name] != true {
+                                Task {
+                                    do {
+                                        let url = modelManager.fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf")
+                                        try await modelManager.loadModel(at: url)
+                                    } catch {
+                                        errorMessage = "Kunde inte ladda modellen: \(error.localizedDescription)"
+                                        showingErrorAlert = true
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if modelManager.isModelDownloaded(model) {
+                            Image(systemName: modelManager.isModelSelected(model) ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(modelManager.isModelSelected(model) ? .green : .gray)
+                                .font(.title2)
+                                .padding(20)
+                        }
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(isDarkMode ? Color(.secondarySystemBackground) : Color.gray.opacity(0.2))
-                            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-                    )
                     .padding(.horizontal)
                 }
             }
@@ -162,7 +162,7 @@ struct ModelPickerView: View {
                 }
             }
         }
-        .alert("Error", isPresented: $showingErrorAlert) {
+        .alert("Fel", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorMessage ?? "")
