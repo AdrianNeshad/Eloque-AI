@@ -49,6 +49,11 @@ class StringManager {
         "chathistory": "Chatthistorik",
         "thinking": "Tänker",
         "recommended": "Rekommenderad enhet:",
+        "choosefile": "Välj GGUF-fil",
+        "architecture": "Arkitektur",
+        "name": "Namn",
+        "save": "Spara modell",
+        "addmodel": "Lägg till modell",
     ]
     
     private let en: [String: String] = [
@@ -89,6 +94,11 @@ class StringManager {
         "chathistory": "Chat history",
         "thinking": "Thinking",
         "recommended": "Recommended device:",
+        "choosefile": "Choose GGUF-file",
+        "architecture": "Architecture",
+        "name": "Name",
+        "save": "Save model",
+        "addmodel": "Add model",
     ]
     
     private var tables: [String: [String: String]] {
