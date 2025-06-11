@@ -23,7 +23,7 @@ struct ChatView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var currentChatID: UUID?
     @State private var showThinkingAnimation = false
-    @State private var showSafariSheet = false
+    @State private var showGuideSheet = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -127,12 +127,12 @@ struct ChatView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    showSafariSheet = true
+                    showGuideSheet = true
                 } label: {
                     Image(systemName: "info.circle")
                         .foregroundColor(.blue)
                 }
-                .sheet(isPresented: $showSafariSheet) {
+                .sheet(isPresented: $showGuideSheet) {
                     GuideTextView()
                         .ignoresSafeArea()
                 }
