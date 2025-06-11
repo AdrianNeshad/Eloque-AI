@@ -12,7 +12,7 @@ struct ChatView: View {
     @StateObject var viewModel = ChatViewModel()
     @ObservedObject var chatHistoryManager: ChatHistoryManager
     let loadedChat: ChatHistory?
-    
+
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("appLanguage") private var appLanguage = "en"
     @State private var inputText = ""
@@ -22,56 +22,32 @@ struct ChatView: View {
     @State private var showSaveAlert = false
     @Environment(\.dismiss) private var dismiss
     @State private var currentChatID: UUID?
-    
+
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             ScrollViewReader { proxy in
                 ScrollView {
-                    LazyVStack {
+                    LazyVStack(spacing: 0) {
                         ForEach(viewModel.messages) { msg in
-                            HStack {
-                                if msg.isFromUser { Spacer() }
-                                Text(msg.text)
-                                    .padding()
-                                    .background(msg.isFromUser ? Color.blue : Color.gray.opacity(0.3))
-                                    .foregroundColor(msg.isFromUser ? .white : (isDarkMode ? .white : .black))
-                                    .cornerRadius(16)
-                                if !msg.isFromUser { Spacer() }
-                            }
-                            .padding(.horizontal)
-                            .id(msg.id)
+                            ChatBubble(text: msg.text, isFromUser: msg.isFromUser, isDarkMode: isDarkMode)
+                                .id(msg.id)
                         }
                         if viewModel.isGenerating {
-                            HStack(alignment: .bottom) {
-                                if let partial = viewModel.partialResponse, !partial.isEmpty {
-                                    Text(partial)
-                                        .foregroundColor(isDarkMode ? .white : .black)
-                                        .frame(minWidth: 120, maxWidth: 340, alignment: .leading)
-                                } else {
-                                    DotsAnimationView()
-                                        .frame(minWidth: 120, maxWidth: 340, alignment: .leading)
-                                }
-                            }
-                            .padding()
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(16)
-                            .padding(.horizontal)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                            ChatBubble(
+                                text: viewModel.partialResponse ?? StringManager.shared.get("thinking") + "...",
+                                isFromUser: false,
+                                isDarkMode: isDarkMode
+                            )
                         }
                         Color.clear
                             .frame(height: 1)
                             .id("BottomID")
                     }
-                    .background(
-                        GeometryReader { geo in
-                            Color.clear
-                                .preference(key: ScrollOffsetPreferenceKey.self, value: geo.frame(in: .named("scroll")).minY)
-                        }
-                    )
                 }
                 .coordinateSpace(name: "scroll")
                 .gesture(
                     DragGesture().onChanged { _ in
+                        if isInputFieldFocused { isInputFieldFocused = false }
                         isUserScrollingManually = true
                     }
                 )
@@ -92,23 +68,38 @@ struct ChatView: View {
                     }
                 }
             }
-            
-            HStack {
-                TextField("Prompt...", text: $inputText)
-                    .textFieldStyle(.roundedBorder)
-                    .disabled(viewModel.isGenerating)
+
+            Divider()
+                .padding(.bottom, 2)
+
+            HStack(spacing: 10) {
+                TextField("Prompt", text: $inputText, axis: .vertical)
+                    .lineLimit(1...6)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 22)
+                            .fill(isDarkMode ? Color(.systemGray4) : Color(.systemGray5))
+                    )
                     .focused($isInputFieldFocused)
-                
-                Button(StringManager.shared.get("send")) {
+                    .disabled(viewModel.isGenerating)
+
+                Button {
                     viewModel.modelPath = modelManager.currentModelPath
-                    viewModel.sendMessage(inputText) {
-                    }
+                    viewModel.sendMessage(inputText) { }
                     inputText = ""
+                } label: {
+                    Image(systemName: "paperplane.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isGenerating ? .gray : .blue)
+                        .padding(.horizontal, 2)
                 }
                 .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isGenerating)
             }
-            .padding()
+            .padding([.horizontal, .top])
+            .padding(.bottom, 8)
         }
+        .background(isDarkMode ? Color(.systemBackground) : Color(.systemGroupedBackground))
         .navigationTitle(StringManager.shared.get("chat"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -133,15 +124,15 @@ struct ChatView: View {
             viewModel.modelPath = modelManager.currentModelPath
         }
     }
-    
+
     private func saveCurrentChat() {
         guard !viewModel.messages.isEmpty,
               let modelPath = modelManager.currentModelPath else { return }
-        
+
         let modelName = URL(fileURLWithPath: modelPath).deletingPathExtension().lastPathComponent
-        
+
         chatHistoryManager.saveChat(id: currentChatID, messages: viewModel.messages, modelName: modelName)
-        
+
         if currentChatID == nil, let firstChat = chatHistoryManager.savedChats.first {
             currentChatID = firstChat.id
             print("Assigned new chat ID: \(currentChatID!)")
