@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var showChatView = false
     @State private var selectedChat: ChatHistory?
     @State private var showSafariSheet = false
+    @State private var showGuideSheet = false
 
     var body: some View {
         NavigationStack {
@@ -148,6 +149,18 @@ struct ContentView: View {
             .navigationTitle("")
             .preferredColorScheme(isDarkMode ? .dark : .light)
             .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showGuideSheet = true
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .foregroundColor(.blue)
+                    }
+                    .sheet(isPresented: $showGuideSheet) {
+                        GuideTextView()
+                            .presentationDetents([.fraction(0.8), .large])
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: Settings()) {
                         Image(systemName: "gearshape")
