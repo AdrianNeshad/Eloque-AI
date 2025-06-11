@@ -15,13 +15,27 @@ struct ModelPickerView: View {
     @State private var showingErrorAlert = false
     @State private var showingDeleteConfirmation = false
     @State private var modelToDelete: LLMModelInfo? = nil
+
+    private var sortedModels: [LLMModelInfo] {
+        modelManager.availableModels.sorted { model1, model2 in
+            let isModel1Downloaded = modelManager.isModelDownloaded(model1)
+            let isModel2Downloaded = modelManager.isModelDownloaded(model2)
+            if isModel1Downloaded && !isModel2Downloaded {
+                return true
+            }
+            if !isModel1Downloaded && isModel2Downloaded {
+                return false
+            }
+            return model1.name < model2.name
+        }
+    }
     
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                ForEach(modelManager.availableModels) { model in
+                ForEach(sortedModels) { model in
                     ZStack(alignment: .topTrailing) {
-                        VStack(alignment: .leading, spacing: 0) { 
+                        VStack(alignment: .leading, spacing: 0) {
                             VStack(alignment: .leading) {
                                 Text(model.name)
                                     .font(.title)
