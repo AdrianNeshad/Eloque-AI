@@ -1,51 +1,51 @@
 [
     {
-        "name": "Google Gemma-2-2B-IT Q4_K_M",
+        "name": "Google Gemma-2\n2B-IT Q4_K_M",
         "url": "https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q4_K_M.gguf?download=true",
         "sizeMB": 1751,
-        "description": "• Googles Gemma 2b\n• Multilingual\nInstruction adjusted. Optimized for performance and quality on all phones",
+        "description": "• Googles Gemma 2b\n• Multilingual\nInstruction adjusted. Optimized for balanced performance and quality on all devices, including phones",
         "compatibility": "mac, ipad, iphone"
     },
     {
-        "name": "Google Gemma-2-2B-IT Q5_K_M",
+        "name": "Google Gemma-2\n2B-IT Q5_K_M",
         "url": "https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q5_K_M.gguf?download=true",
         "sizeMB": 1923,
-        "description": "• Googles Gemma 2b\n• Multilingual\ninstruction adjusted. Optimized for performance",
+        "description": "• Googles Gemma 2b\n• Multilingual\nInstruction adjusted. Enhanced performance, recommended for newer Mac and iPad",
         "compatibility": "mac, ipad"
     },
     {
-        "name": "Google Gemma-2-2B-IT Q8",
+        "name": "Google Gemma-2\n2B-IT Q8",
         "url": "https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q8_0.gguf?download=true",
         "sizeMB": 2780,
-        "description": "• Googles Gemma 2b\n• Multilingual\nInstruction adjusted. Full performance",
+        "description": "• Googles Gemma 2b\n• Multilingual\nInstruction adjusted. Full precision version for maximum quality",
         "compatibility": "mac"
     },
     {
-        "name": "Meta Llama 8B Q3_K_M",
+        "name": "Meta LlaMa\n8B Q3_K_M",
         "url": "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q3_K_M.gguf?download=true",
         "sizeMB": 4083,
-        "description": "• Metas Llama-model\nInstruction adjusted. medium performance",
+        "description": "• Metas LlaMa-model\nInstruction tuned for improved chat and reasoning. Medium performance, runs well on all devices",
         "compatibility": "mac, ipad, iphone"
     },
     {
-        "name": "Microsoft Phi-3.5-mini-4K Q3_K_L",
+        "name": "Microsoft Phi-3.5\nmini-4K Q3_K_L",
         "url": "https://huggingface.co/bartowski/Phi-3-mini-4k-instruct-GGUF/resolve/main/Phi-3-mini-4k-instruct-Q3_K_L.gguf?download=true",
         "sizeMB": 2077,
-        "description": "• Microsofts Phi-3.5-model\n• Multilingual\nInstruction adjusted for 4k context",
+        "description": "• Microsofts Phi-3.5-model\n• Multilingual\nDesigned for strong instruction-following and extended 4K context. Lightweight, suitable for most devices",
         "compatibility": "mac, ipad, iphone"
     },
     {
-        "name": "Microsoft Phi-3.5-mini-4K Q5_K_S",
+        "name": "Microsoft Phi-3.5\nmini-4K Q5_K_S",
         "url": "https://huggingface.co/bartowski/Phi-3-mini-4k-instruct-GGUF/resolve/main/Phi-3-mini-4k-instruct-Q5_K_S.gguf?download=true",
         "sizeMB": 2641,
-        "description": "• Microsofts Phi-3.5-model\n• Multilingual\nEven more powerful",
+        "description": "• Microsofts Phi-3.5-model\n• Multilingual\nEnhanced power for faster responses and higher accuracy. Optimized for newer Mac and iPad",
         "compatibility": "mac, ipad"
     },
     {
-        "name": "Microsoft Phi-3.5-mini-4K Q8",
+        "name": "Microsoft Phi-3.5\nmini-4K Q8",
         "url": "https://huggingface.co/bartowski/Phi-3-mini-4k-instruct-GGUF/resolve/main/Phi-3-mini-4k-instruct-Q8_0.gguf?download=true",
         "sizeMB": 4064,
-        "description": "• Microsofts Phi-3.5-model\n• Multilingual\nMost powerful Phi-3.5 model",
+        "description": "• Microsofts Phi-3.5-model\n• Multilingual\nHighest precision version for maximum performance and quality. Best suited for Mac",
         "compatibility": "mac"
     },
 ]

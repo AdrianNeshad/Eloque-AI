@@ -42,6 +42,7 @@ struct ModelPickerView: View {
                                     Text(model.name)
                                         .font(.title)
                                         .bold()
+                                        .padding(.bottom, 5)
                                 }
                                 Text(model.description)
                                     .font(.subheadline)

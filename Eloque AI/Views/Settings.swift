@@ -138,7 +138,7 @@ struct Settings: View {
                                             .resizable()
                                             .frame(width: 30, height: 30)
                                             .cornerRadius(8)
-                                        Text("Univert - Universal Unit Converter")
+                                        Text("Univert - Unit Converter")
                                     }
                                 }
                 Link(destination: URL(string: "https://apps.apple.com/us/app/flixswipe-explore-new-movies/id6746716902")!) {
