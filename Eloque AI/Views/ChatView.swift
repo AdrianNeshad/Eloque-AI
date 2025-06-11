@@ -88,7 +88,7 @@ struct ChatView: View {
             }
 
             Divider()
-                .padding(.bottom, 2)
+                .padding(.bottom, 1)
 
             HStack(spacing: 10) {
                 TextField("Prompt", text: $inputText, axis: .vertical)
