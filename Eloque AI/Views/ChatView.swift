@@ -23,6 +23,7 @@ struct ChatView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var currentChatID: UUID?
     @State private var showThinkingAnimation = false
+    @State private var showSafariSheet = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -123,6 +124,20 @@ struct ChatView: View {
         .background(isDarkMode ? Color(.systemBackground) : Color(.systemGroupedBackground))
         .navigationTitle(StringManager.shared.get("chat"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showSafariSheet = true
+                } label: {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.blue)
+                }
+                .sheet(isPresented: $showSafariSheet) {
+                    SafariView(url: URL(string: "https://google.com")!)
+                        .ignoresSafeArea()
+                }
+            }
+        }
         .onAppear {
             if let loadedChat = loadedChat {
                 viewModel.loadChat(loadedChat)

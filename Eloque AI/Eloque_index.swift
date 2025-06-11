@@ -15,6 +15,7 @@ struct ContentView: View {
     @State private var showNoModelAlert = false
     @State private var showChatView = false
     @State private var selectedChat: ChatHistory?
+    @State private var showSafariSheet = false
 
     var body: some View {
         NavigationStack {
@@ -84,7 +85,7 @@ struct ContentView: View {
                                     .padding(.leading, 4)
                                 Spacer()
                                 Text("(Max 2)")
-                                .font(.caption)
+                                    .font(.caption)
                             }
                             
                             ForEach(chatHistoryManager.savedChats) { chat in
