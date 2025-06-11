@@ -43,6 +43,15 @@ struct AddModel: View {
                 ) { result in
                     do {
                         guard let url = try result.get().first else { return }
+                        var didStartAccessing = false
+                        if url.startAccessingSecurityScopedResource() {
+                            didStartAccessing = true
+                        }
+                        defer {
+                            if didStartAccessing {
+                                url.stopAccessingSecurityScopedResource()
+                            }
+                        }
                         selectedFileURL = url
                         modelName = url.deletingPathExtension().lastPathComponent
                         if let fileSizeNum = try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? NSNumber {
@@ -115,7 +124,7 @@ struct AddModel: View {
                 url: destination,
                 sizeMB: sizeMB,
                 description: description + " (\(arch.rawValue))",
-                compatibility: ""
+                compatibility: "custom"
             )
             modelManager.availableModels.append(newModel)
             modelManager.saveAvailableModels()   

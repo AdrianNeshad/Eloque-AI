@@ -28,6 +28,7 @@ struct LLMModelInfo: Identifiable, Codable {
         case "mac": return "macbook"
         case "ipad": return "ipad.landscape"
         case "iphone": return "iphone"
+        case "custom": return "folder.badge.person.crop"
         default: return nil
         }
     }
