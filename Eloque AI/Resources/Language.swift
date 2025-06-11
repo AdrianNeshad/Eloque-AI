@@ -56,6 +56,8 @@ class StringManager {
         "addmodel": "Lägg till modell",
         "gguffile": "GGUF-Fil",
         "choosearchitecture": "Modellens arkitektur",
+        "suredeletemodel": "Är du säker?",
+        "deletemodelmessage": "Är du säker på att du vill radera modellen?",
     ]
     
     private let en: [String: String] = [
@@ -103,6 +105,8 @@ class StringManager {
         "addmodel": "Add model",
         "gguffile": "GGUF-File",
         "choosearchitecture": "Model architecture",
+        "suredeletemodel": "Are you sure?",
+        "deletemodelmessage": "Are you sure you want to delete the model?",
     ]
     
     private var tables: [String: [String: String]] {

@@ -11,16 +11,17 @@ struct ModelPickerView: View {
     @EnvironmentObject var modelManager: ModelManager
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("appLanguage") private var appLanguage = "en"
-    
     @State private var errorMessage: String? = nil
     @State private var showingErrorAlert = false
+    @State private var showingDeleteConfirmation = false
+    @State private var modelToDelete: LLMModelInfo? = nil
     
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 ForEach(modelManager.availableModels) { model in
                     ZStack(alignment: .topTrailing) {
-                        VStack(alignment: .leading, spacing: 0) {
+                        VStack(alignment: .leading, spacing: 0) { 
                             VStack(alignment: .leading) {
                                 Text(model.name)
                                     .font(.title)
@@ -45,6 +46,7 @@ struct ModelPickerView: View {
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding([.horizontal, .top])
+                            
                             HStack(spacing: 8) {
                                 if let progress = modelManager.downloadProgress[model.name] {
                                     VStack(alignment: .leading, spacing: 4) {
@@ -81,12 +83,8 @@ struct ModelPickerView: View {
                                     }
                                 } else if modelManager.isModelDownloaded(model) {
                                     Button(role: .destructive) {
-                                        do {
-                                            try modelManager.deleteModel(model)
-                                        } catch {
-                                            errorMessage = "Kunde inte radera modellen: \(error.localizedDescription)"
-                                            showingErrorAlert = true
-                                        }
+                                        modelToDelete = model
+                                        showingDeleteConfirmation = true
                                     } label: {
                                         Label(StringManager.shared.get("delete"), systemImage: "trash")
                                     }
@@ -162,10 +160,25 @@ struct ModelPickerView: View {
                 }
             }
         }
-        .alert("Fel", isPresented: $showingErrorAlert) {
+        .alert("Error", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorMessage ?? "")
+        }
+        .confirmationDialog(StringManager.shared.get("suredeletemodel"), isPresented: $showingDeleteConfirmation, presenting: modelToDelete) { model in
+            Button(StringManager.shared.get("delete") + " \(model.name)\"", role: .destructive) {
+                Task {
+                    do {
+                        try modelManager.deleteModel(model)
+                    } catch {
+                        errorMessage = "Error: \(error.localizedDescription)"
+                        showingErrorAlert = true
+                    }
+                } 
+            }
+            Button(StringManager.shared.get("cancel"), role: .cancel) { }
+        } message: { model in
+            Text(StringManager.shared.get("deletemodelmessage") + " \"\(model.name)\"?")
         }
     }
 }
