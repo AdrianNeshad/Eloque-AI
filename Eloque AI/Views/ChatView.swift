@@ -22,6 +22,7 @@ struct ChatView: View {
     @State private var showSaveAlert = false
     @Environment(\.dismiss) private var dismiss
     @State private var currentChatID: UUID?
+    @State private var showThinkingAnimation = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,13 +33,24 @@ struct ChatView: View {
                             ChatBubble(text: msg.text, isFromUser: msg.isFromUser, isDarkMode: isDarkMode)
                                 .id(msg.id)
                         }
-                        if viewModel.isGenerating {
+                        
+                        if viewModel.isGenerating && viewModel.partialResponse?.isEmpty ?? true {
                             ChatBubble(
-                                text: viewModel.partialResponse ?? StringManager.shared.get("thinking") + "...",
+                                text: StringManager.shared.get("thinking") + "...",
+                                isFromUser: false,
+                                isDarkMode: isDarkMode,
+                                showDotsAnimation: true
+                            )
+                            .id("ThinkingAnimationID")
+                        } else if viewModel.isGenerating {
+                            ChatBubble(
+                                text: viewModel.partialResponse ?? "",
                                 isFromUser: false,
                                 isDarkMode: isDarkMode
                             )
+                            .id("PartialResponseID")
                         }
+                        
                         Color.clear
                             .frame(height: 1)
                             .id("BottomID")
@@ -64,7 +76,13 @@ struct ChatView: View {
                 }
                 .onChange(of: viewModel.partialResponse) {
                     if !isUserScrollingManually {
-                        proxy.scrollTo("BottomID", anchor: .bottom)
+                        if !(viewModel.partialResponse?.isEmpty ?? true) {
+                            proxy.scrollTo("PartialResponseID", anchor: .bottom)
+                        } else if viewModel.isGenerating {
+                            proxy.scrollTo("ThinkingAnimationID", anchor: .bottom)
+                        } else {
+                            proxy.scrollTo("BottomID", anchor: .bottom)
+                        }
                     }
                 }
             }
@@ -86,7 +104,10 @@ struct ChatView: View {
 
                 Button {
                     viewModel.modelPath = modelManager.currentModelPath
-                    viewModel.sendMessage(inputText) { }
+                    showThinkingAnimation = true
+                    viewModel.sendMessage(inputText) {
+                        showThinkingAnimation = false
+                    }
                     inputText = ""
                 } label: {
                     Image(systemName: "paperplane.fill")
