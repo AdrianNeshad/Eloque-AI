@@ -16,7 +16,7 @@ struct GuideTextView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(appLanguage == "sv" ? "Din omfattande guide till Eloque AI" : "Your Comprehensive Guide to Eloque AI")
-                        .font(.title2)
+                        .font(.title)
                         .bold()
                         .padding(.bottom, 5)
 
@@ -80,6 +80,7 @@ struct GuideTextView: View {
                     Text(appLanguage == "sv" ? "\nVi hoppas att du får stor nytta och glädje av Eloque AI!" : "\nWe hope you get great use and enjoyment out of Eloque AI!")
                         .font(.body)
                         .padding(.top, 10)
+                        .bold()
 
                 }
                 .padding()
@@ -94,11 +95,5 @@ struct GuideTextView: View {
                 }
             }
         }
-    }
-}
-
-struct GuideTextView_Previews: PreviewProvider {
-    static var previews: some View {
-        GuideTextView()
     }
 }
