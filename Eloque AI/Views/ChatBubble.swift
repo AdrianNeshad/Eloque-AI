@@ -22,6 +22,7 @@ struct ChatBubble: View {
                     DotsAnimationView()
                 } else {
                     Text(text)
+                        .textSelection(.enabled)
                 }
             }
             .padding(.vertical, 10)
@@ -33,6 +34,7 @@ struct ChatBubble: View {
             )
             .foregroundColor(isFromUser ? .white : (isDarkMode ? .white : .black))
             .cornerRadius(22)
+            .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: isFromUser ? .trailing : .leading)
             
             if isFromUser { Spacer() }

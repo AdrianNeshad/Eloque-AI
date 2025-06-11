@@ -33,6 +33,8 @@ struct ContentView: View {
                 Text(StringManager.shared.get("Index_banner"))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
 
                 if let currentPath = modelManager.currentModelPath {
                     HStack {
@@ -41,7 +43,8 @@ struct ContentView: View {
                             .font(.subheadline)
                             .foregroundColor(.green)
                             .lineLimit(2)
-                    }
+                            .fixedSize(horizontal: false, vertical: true)
+                                        }
                 } else {
                     Text(StringManager.shared.get("nomodelchosen"))
                         .font(.subheadline)

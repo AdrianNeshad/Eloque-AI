@@ -34,7 +34,7 @@ struct ChatView: View {
                             ChatBubble(text: msg.text, isFromUser: msg.isFromUser, isDarkMode: isDarkMode)
                                 .id(msg.id)
                         }
-                        
+
                         if viewModel.isGenerating && viewModel.partialResponse?.isEmpty ?? true {
                             ChatBubble(
                                 text: StringManager.shared.get("thinking") + "...",
@@ -51,21 +51,24 @@ struct ChatView: View {
                             )
                             .id("PartialResponseID")
                         }
-                        
+
                         Color.clear
                             .frame(height: 1)
                             .id("BottomID")
                     }
                 }
                 .coordinateSpace(name: "scroll")
+                .onTapGesture {
+                    isInputFieldFocused = false
+                }
                 .gesture(
                     DragGesture().onChanged { _ in
-                        if isInputFieldFocused { isInputFieldFocused = false }
+                        isInputFieldFocused = false
                         isUserScrollingManually = true
                     }
                 )
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { newOffset in
-                    if newOffset > lastContentOffset && isInputFieldFocused {
+                    if isInputFieldFocused {
                         isInputFieldFocused = false
                     }
                     lastContentOffset = newOffset
