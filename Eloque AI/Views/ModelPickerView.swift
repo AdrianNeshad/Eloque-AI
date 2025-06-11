@@ -109,7 +109,7 @@ struct ModelPickerView: View {
                                 ForEach(model.compatibleDevices, id: \.self) { device in
                                     if let iconName = model.systemIconName(for: device) {
                                         Image(systemName: iconName)
-                                            .font(.caption)
+                                            .font(.body)
                                             .foregroundColor(.blue)
                                     }
                                 }
