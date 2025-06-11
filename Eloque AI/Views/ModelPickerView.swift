@@ -46,7 +46,7 @@ struct ModelPickerView: View {
                                 Text(model.description)
                                     .font(.subheadline)
                                     .padding(.bottom, 10)
-                                 
+                                    .lineLimit(UIDevice.current.userInterfaceIdiom == .pad ? 2 : nil)
                                 HStack {
                                     Text(StringManager.shared.get("size"))
                                     Text("\(model.sizeMB)")
@@ -63,7 +63,7 @@ struct ModelPickerView: View {
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding([.horizontal, .top])
-                            
+                            .frame(minHeight: UIDevice.current.userInterfaceIdiom == .pad ? 120 : nil)
                             HStack(spacing: 8) {
                                 if let progress = modelManager.downloadProgress[model.name] {
                                     VStack(alignment: .leading, spacing: 4) {
