@@ -134,7 +134,7 @@ struct ChatView: View {
                 }
                 .sheet(isPresented: $showGuideSheet) {
                     GuideTextView()
-                        .ignoresSafeArea()
+                        .presentationDetents([.fraction(0.8), .large])
                 }
             }
         }
