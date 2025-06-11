@@ -22,7 +22,7 @@ class ChatViewModel: ObservableObject {
         messages.append(ChatMessage(text: prompt, isFromUser: true))
         isGenerating = true
         partialResponse = ""
-
+        
         Task {
             guard let path = modelPath else {
                 messages.append(ChatMessage(text: "⚠️ n", isFromUser: false))
@@ -31,13 +31,16 @@ class ChatViewModel: ObservableObject {
                 completion?()
                 return
             }
-
+            
             let formatter: InteractionFormatting
             let modelArchitecture: ModelArchitecture
-            if path.contains("deepseek") || path.contains("zephyr") {
-                formatter = ChatMLInteractionFormatter()
-                modelArchitecture = .openChat
-            } else if path.contains("mixtral") || path.contains("llama") {
+            if path.contains("mixtral") || path.contains("mistral")  {
+                formatter = StandardInteractionFormatter()
+                modelArchitecture = .mistralInstruct
+            } else if path.contains("llama3") {
+                formatter = StandardInteractionFormatter()
+                modelArchitecture = .llama3
+            } else if path.contains("llama") {
                 formatter = StandardInteractionFormatter()
                 modelArchitecture = .llamaGeneral
             } else if path.contains("phi-3") {
@@ -46,6 +49,9 @@ class ChatViewModel: ObservableObject {
             } else if path.contains("gemma") {
                 formatter = StandardInteractionFormatter()
                 modelArchitecture = .gemmaInstruct
+            } else if path.contains("openchat") {
+                formatter = StandardInteractionFormatter()
+                modelArchitecture = .openChat
             } else {
                 formatter = StandardInteractionFormatter()
                 modelArchitecture = .llamaGeneral
