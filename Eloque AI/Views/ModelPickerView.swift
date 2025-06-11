@@ -151,6 +151,14 @@ struct ModelPickerView: View {
             try? await modelManager.loadAvailableModels()
         }
         .navigationTitle(StringManager.shared.get("models"))
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink(destination: AddModel()) {
+                    Image(systemName: "plus")
+                        .foregroundColor(.blue)
+                }
+            }
+        }
         .alert("Error", isPresented: $showingErrorAlert) {
             Button("OK", role: .cancel) {}
         } message: {
