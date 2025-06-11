@@ -54,6 +54,8 @@ class StringManager {
         "name": "Namn",
         "save": "Spara modell",
         "addmodel": "Lägg till modell",
+        "gguffile": "GGUF-Fil",
+        "choosearchitecture": "Modellens arkitektur",
     ]
     
     private let en: [String: String] = [
@@ -99,6 +101,8 @@ class StringManager {
         "name": "Name",
         "save": "Save model",
         "addmodel": "Add model",
+        "gguffile": "GGUF-File",
+        "choosearchitecture": "Model architecture",
     ]
     
     private var tables: [String: [String: String]] {

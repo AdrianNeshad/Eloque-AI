@@ -32,7 +32,7 @@ struct AddModel: View {
     
     var body: some View {
         Form {
-            Section(header: Text("GGUF-file")) {
+            Section(header: Text(StringManager.shared.get("gguffile"))) {
                 Button(StringManager.shared.get("choosefile")) {
                     showingFileImporter = true
                 }
@@ -72,7 +72,7 @@ struct AddModel: View {
             }
             
             Section(header: Text(StringManager.shared.get("architecture"))) {
-                Picker(StringManager.shared.get("architecture"), selection: $selectedArchitecture) {
+                Picker(StringManager.shared.get("choosearchitecture"), selection: $selectedArchitecture) {
                     ForEach(ModelArchitectureType.allCases) { type in
                         Text(type.rawValue).tag(type as ModelArchitectureType?)
                     }

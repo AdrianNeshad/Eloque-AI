@@ -126,7 +126,7 @@ struct ContentView: View {
                                     .padding()
                                     .background(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .fill(isDarkMode ? Color.gray.opacity(0.3) : Color.gray.opacity(0.4))
+                                            .fill(isDarkMode ? Color.gray.opacity(0.3) : Color.gray.opacity(0.3))
                                     )
                                 }
                                 .buttonStyle(.plain)
