@@ -12,4 +12,8 @@ struct FileHelper {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         return dir
     }
+
+    var modelListURL: URL {
+        modelsDirectory.appendingPathComponent("ModelList.json")
+    }
 }

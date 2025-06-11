@@ -7,14 +7,14 @@
 
 import Foundation
 
-struct LLMModelInfo: Identifiable, Decodable {
+struct LLMModelInfo: Identifiable, Codable {
     let name: String
     let url: URL
     let sizeMB: Int
     let description: String
     let compatibility: String
     let id = UUID()
-
+    
     private enum CodingKeys: String, CodingKey {
         case name, url, sizeMB, description, compatibility
     }

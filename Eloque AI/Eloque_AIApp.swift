@@ -31,6 +31,7 @@ struct Eloque_AIApp: App {
                 }
                 .onAppear {
                     if !hasLaunchedBefore {
+                        modelManager.prepareModelList()    
                         setLanguageFromSystem()
                         setDarkModeFromSystem()
                         hasLaunchedBefore = true

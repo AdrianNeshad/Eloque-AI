@@ -27,21 +27,66 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
         return URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }()
     
+    func prepareModelList() {
+        let fileManager = FileManager.default
+        let docs = fileHelper.modelsDirectory
+        let modelListURL = docs.appendingPathComponent("ModelList.json")
+        
+        if !fileManager.fileExists(atPath: modelListURL.path) {
+            if let bundleURL = Bundle.main.url(forResource: "ModelList", withExtension: "json") {
+                try? fileManager.copyItem(at: bundleURL, to: modelListURL)
+            } else {
+                let emptyList: [LLMModelInfo] = []
+                if let data = try? JSONEncoder().encode(emptyList) {
+                    try? data.write(to: modelListURL)
+                }
+            }
+        }
+    }
+    
     func loadAvailableModels() async throws {
-        guard let url = Bundle.main.url(forResource: "ModelList", withExtension: "json") else { return }
-        let data = try Data(contentsOf: url)
-        let models = try JSONDecoder().decode([LLMModelInfo].self, from: data)
+        let docs = fileHelper.modelsDirectory
+        let url = docs.appendingPathComponent("ModelList.json")
+        let fileManager = FileManager.default
+        var models: [LLMModelInfo] = []
+
+        if let data = try? Data(contentsOf: url), !data.isEmpty {
+            models = (try? JSONDecoder().decode([LLMModelInfo].self, from: data)) ?? []
+        }
+        if let bundleURL = Bundle.main.url(forResource: "ModelList", withExtension: "json"),
+           let bundleData = try? Data(contentsOf: bundleURL) {
+            let bundleModels = (try? JSONDecoder().decode([LLMModelInfo].self, from: bundleData)) ?? []
+       
+            for bundleModel in bundleModels {
+                if !models.contains(where: { $0.name == bundleModel.name }) {
+                    models.append(bundleModel)
+                }
+            }
+        }
         DispatchQueue.main.async {
             self.availableModels = models
         }
     }
+
+    func saveAvailableModels() {
+        let docs = fileHelper.modelsDirectory
+        let url = docs.appendingPathComponent("ModelList.json")
+        if let data = try? JSONEncoder().encode(self.availableModels) {
+            try? data.write(to: url)
+        }
+    }
     
+    func initialize() {
+        prepareModelList()
+        Task {
+            try? await loadAvailableModels()
+        }
+    }
+
     @MainActor
     func loadLastSelectedModel() async {
         guard !lastSelectedModelName.isEmpty else { return }
-        
         let modelURL = fileHelper.modelsDirectory.appendingPathComponent("\(lastSelectedModelName).gguf")
-        
         if FileManager.default.fileExists(atPath: modelURL.path) {
             do {
                 try await loadModel(at: modelURL)

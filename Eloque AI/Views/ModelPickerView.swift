@@ -148,7 +148,9 @@ struct ModelPickerView: View {
             .padding(.vertical)
         }
         .task {
-            try? await modelManager.loadAvailableModels()
+            if modelManager.availableModels.isEmpty {
+                try? await modelManager.loadAvailableModels()
+            }
         }
         .navigationTitle(StringManager.shared.get("models"))
         .toolbar {
