@@ -7,18 +7,18 @@
 
 import Foundation
 
-struct LLMModelInfo: Identifiable, Codable {
+struct LLMModelInfo: Identifiable, Codable, Equatable {
     let name: String
     let url: URL
     let sizeMB: Int
     let description: String
     let compatibility: String
     let id = UUID()
-    
+
     private enum CodingKeys: String, CodingKey {
         case name, url, sizeMB, description, compatibility
     }
-    
+
     var compatibleDevices: [String] {
         compatibility.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
     }
@@ -31,5 +31,9 @@ struct LLMModelInfo: Identifiable, Codable {
         case "custom": return "folder.badge.person.crop"
         default: return nil
         }
+    }
+    
+    static func == (lhs: LLMModelInfo, rhs: LLMModelInfo) -> Bool {
+        lhs.name == rhs.name
     }
 }

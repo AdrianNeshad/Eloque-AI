@@ -21,7 +21,6 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
     private var currentProfile: ModelProfile?
     let fileHelper = FileHelper()
     private var downloadContinuations: [String: CheckedContinuation<URL, Error>] = [:]
-
     private lazy var session: URLSession = {
         let config = URLSessionConfiguration.default
         return URLSession(configuration: config, delegate: self, delegateQueue: nil)
@@ -34,7 +33,11 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
         
         if !fileManager.fileExists(atPath: modelListURL.path) {
             if let bundleURL = Bundle.main.url(forResource: "ModelList", withExtension: "json") {
-                try? fileManager.copyItem(at: bundleURL, to: modelListURL)
+                do {
+                    try fileManager.copyItem(at: bundleURL, to: modelListURL)
+                } catch {
+                    print("Error copying ModelList.json from bundle: \(error.localizedDescription)")
+                }
             } else {
                 let emptyList: [LLMModelInfo] = []
                 if let data = try? JSONEncoder().encode(emptyList) {
@@ -48,31 +51,57 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
         let docs = fileHelper.modelsDirectory
         let url = docs.appendingPathComponent("ModelList.json")
         let fileManager = FileManager.default
-        var models: [LLMModelInfo] = []
-
+        
+        var modelsFromFile: [LLMModelInfo] = []
         if let data = try? Data(contentsOf: url), !data.isEmpty {
-            models = (try? JSONDecoder().decode([LLMModelInfo].self, from: data)) ?? []
+            modelsFromFile = (try? JSONDecoder().decode([LLMModelInfo].self, from: data)) ?? []
         }
+        
+        var bundleModels: [LLMModelInfo] = []
         if let bundleURL = Bundle.main.url(forResource: "ModelList", withExtension: "json"),
            let bundleData = try? Data(contentsOf: bundleURL) {
-            let bundleModels = (try? JSONDecoder().decode([LLMModelInfo].self, from: bundleData)) ?? []
-       
-            for bundleModel in bundleModels {
-                if !models.contains(where: { $0.name == bundleModel.name }) {
-                    models.append(bundleModel)
-                }
+            bundleModels = (try? JSONDecoder().decode([LLMModelInfo].self, from: bundleData)) ?? []
+        }
+        
+        var combinedModels = bundleModels
+        for localModel in modelsFromFile {
+            if !combinedModels.contains(where: { $0.name == localModel.name }) {
+                combinedModels.append(localModel)
             }
         }
+        
         DispatchQueue.main.async {
-            self.availableModels = models
+            self.availableModels = combinedModels.sorted { $0.name < $1.name }
         }
     }
-
+    
     func saveAvailableModels() {
         let docs = fileHelper.modelsDirectory
         let url = docs.appendingPathComponent("ModelList.json")
-        if let data = try? JSONEncoder().encode(self.availableModels) {
-            try? data.write(to: url)
+        
+        if let bundleURL = Bundle.main.url(forResource: "ModelList", withExtension: "json"),
+           let bundleData = try? Data(contentsOf: bundleURL),
+           let bundleModels = try? JSONDecoder().decode([LLMModelInfo].self, from: bundleData) {
+            
+            let customModels = self.availableModels.filter { model in
+                !bundleModels.contains(where: { $0.name == model.name })
+            }
+            
+            if let data = try? JSONEncoder().encode(customModels) {
+                do {
+                    try data.write(to: url)
+                } catch {
+                    print("Error saving available models: \(error.localizedDescription)")
+                }
+            }
+        } else {
+            if let data = try? JSONEncoder().encode(self.availableModels) {
+                do {
+                    try data.write(to: url)
+                } catch {
+                    print("Error saving available models (fallback): \(error.localizedDescription)")
+                }
+            }
         }
     }
     
@@ -82,7 +111,7 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
             try? await loadAvailableModels()
         }
     }
-
+    
     @MainActor
     func loadLastSelectedModel() async {
         guard !lastSelectedModelName.isEmpty else { return }
@@ -99,7 +128,7 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
             lastSelectedModelName = ""
         }
     }
-
+    
     func downloadModel(_ model: LLMModelInfo) async throws -> URL {
         self.downloadProgress[model.name] = 0.0
         self.isDownloading[model.name] = true
@@ -112,7 +141,7 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
             downloadTask.resume()
         }
     }
-
+    
     func loadModel(at url: URL) async throws {
         let profile = ModelProfile(sourcePath: url.path, architecture: .llamaGeneral)
         self.currentProfile = profile
@@ -124,7 +153,6 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
         )
         self.currentModel = instance
         
-        // Spara namnet som senaste valda modell
         let modelName = url.deletingPathExtension().lastPathComponent
         lastSelectedModelName = modelName
     }
@@ -136,15 +164,41 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
     
     func deleteModel(_ model: LLMModelInfo) throws {
         let fileURL = fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf")
-        if FileManager.default.fileExists(atPath: fileURL.path) {
-            try FileManager.default.removeItem(at: fileURL)
-            
-            if currentProfile?.sourcePath == fileURL.path {
+        let fileManager = FileManager.default
+        
+        if fileManager.fileExists(atPath: fileURL.path) {
+            do {
+                try fileManager.removeItem(at: fileURL)
+                print("Successfully deleted model file: \(fileURL.lastPathComponent)")
+            } catch {
+                print("Error deleting model file \(fileURL.lastPathComponent): \(error.localizedDescription)")
+                throw error
+            }
+        } else {
+            print("Model file not found at path: \(fileURL.path). Proceeding with list removal if custom.")
+        }
+        
+        if model.compatibility == "custom" {
+            DispatchQueue.main.async {
+                self.availableModels.removeAll { $0.name == model.name }
+                self.saveAvailableModels()
+                print("Removed custom model '\(model.name)' from availableModels list and saved.")
+            }
+        } else {
+            print("Preloaded model '\(model.name)' file deleted, but kept in availableModels list.")
+        }
+        
+        if currentProfile?.sourcePath == fileURL.path {
+            DispatchQueue.main.async {
                 self.currentProfile = nil
                 self.currentModel = nil
+                print("Deselected currently loaded model '\(model.name)'.")
             }
-            if lastSelectedModelName == model.name {
-                lastSelectedModelName = ""
+        }
+        if lastSelectedModelName == model.name {
+            DispatchQueue.main.async {
+                self.lastSelectedModelName = ""
+                print("Cleared last selected model '\(model.name)'.")
             }
         }
     }
@@ -152,7 +206,7 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
     func isModelSelected(_ model: LLMModelInfo) -> Bool {
         currentModelPath == fileHelper.modelsDirectory.appendingPathComponent("\(model.name).gguf").path
     }
-
+    
     var currentModelPath: String? {
         currentProfile?.sourcePath
     }
@@ -194,7 +248,6 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
                     return
                 }
             }
-
             continuation.resume(returning: destination)
         } catch {
             continuation.resume(throwing: error)

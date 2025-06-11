@@ -39,7 +39,9 @@ struct ModelPickerView: View {
                                     Text("MB")
                                         .padding(.leading, -5)
                                     Spacer()
-                                    Text(StringManager.shared.get("recommended"))
+                                    if model.compatibility != "custom" {
+                                        Text(StringManager.shared.get("recommended"))
+                                    }
                                 }
                                 .font(.subheadline)
                                 .padding(.bottom, -12)
