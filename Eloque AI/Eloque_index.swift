@@ -28,6 +28,7 @@ struct ContentView: View {
                 }
                 .scaleEffect(1.5)
                 .padding(.bottom, 150)
+                .padding(.top, 100)
                 Text(StringManager.shared.get("Index_banner"))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
@@ -125,13 +126,14 @@ struct ContentView: View {
                                     .padding()
                                     .background(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .fill(isDarkMode ? Color.gray.opacity(0.2) : Color.gray.opacity(0.1))
+                                            .fill(isDarkMode ? Color.gray.opacity(0.3) : Color.gray.opacity(0.4))
                                     )
                                 }
                                 .buttonStyle(.plain)
                             }
                         }
                         .padding(.top, 8)
+                        .padding(.bottom, 20)
                     }
                 }
                 .padding(.horizontal)
