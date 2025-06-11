@@ -50,7 +50,6 @@ class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
     func loadAvailableModels() async throws {
         let docs = fileHelper.modelsDirectory
         let url = docs.appendingPathComponent("ModelList.json")
-        let fileManager = FileManager.default
         
         var modelsFromFile: [LLMModelInfo] = []
         if let data = try? Data(contentsOf: url), !data.isEmpty {
