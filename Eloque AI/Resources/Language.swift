@@ -58,6 +58,7 @@ class StringManager {
         "choosearchitecture": "Modellens arkitektur",
         "suredeletemodel": "Är du säker?",
         "deletemodelmessage": "Är du säker på att du vill radera modellen?",
+        "close" : "Stäng",
     ]
     
     private let en: [String: String] = [
@@ -107,6 +108,7 @@ class StringManager {
         "choosearchitecture": "Model architecture",
         "suredeletemodel": "Are you sure?",
         "deletemodelmessage": "Are you sure you want to delete the model?",
+        "close": "Close",
     ]
     
     private var tables: [String: [String: String]] {

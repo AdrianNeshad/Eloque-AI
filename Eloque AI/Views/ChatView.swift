@@ -133,7 +133,7 @@ struct ChatView: View {
                         .foregroundColor(.blue)
                 }
                 .sheet(isPresented: $showSafariSheet) {
-                    SafariView(url: URL(string: "https://cloud.google.com/discover/what-is-prompt-engineering")!)
+                    GuideTextView()
                         .ignoresSafeArea()
                 }
             }
