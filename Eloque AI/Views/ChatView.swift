@@ -31,12 +31,12 @@ struct ChatView: View {
                 ScrollView {
                     LazyVStack(spacing: 0) {
                         ForEach(viewModel.messages) { msg in
-                            ChatBubble(text: msg.text, isFromUser: msg.isFromUser, isDarkMode: isDarkMode)
+                            ChatBubbleView(text: msg.text, isFromUser: msg.isFromUser, isDarkMode: isDarkMode)
                                 .id(msg.id)
                         }
 
                         if viewModel.isGenerating && viewModel.partialResponse?.isEmpty ?? true {
-                            ChatBubble(
+                            ChatBubbleView(
                                 text: StringManager.shared.get("thinking") + "...",
                                 isFromUser: false,
                                 isDarkMode: isDarkMode,
@@ -44,7 +44,7 @@ struct ChatView: View {
                             )
                             .id("ThinkingAnimationID")
                         } else if viewModel.isGenerating {
-                            ChatBubble(
+                            ChatBubbleView(
                                 text: viewModel.partialResponse ?? "",
                                 isFromUser: false,
                                 isDarkMode: isDarkMode
